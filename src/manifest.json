@@ -6,7 +6,7 @@
 	"name": "Inline TODO",
 	"description": "Write TODOs *everywhere* and view them in one place.",
 	"author": "Caleb John",
-	"homepage_url": "",
-	"repository_url": "",
+	"homepage_url": "https://github.com/CalebJohn/joplin-inline-todo#readme",
+	"repository_url": "https://github.com/CalebJohn/joplin-inline-todo",
 	"keywords": ["todo", "productivity"]
 }
