@@ -21,7 +21,8 @@ This format does have the limitation that it only accepts dates of the form YYYY
 The basic form is a checkbox, followed by @category (this can be anything, including an assignee), followed by an optional date (prefixed with //), and finally the TODO content.
 
 ```
-I take a lot of notes about various things. It can be helpful to keep my TODOs together with the content they pertain to.
+I take a lot of notes about various things. It can be helpful to
+keep my TODOs together with the content they pertain to.
 
 - [ ] @TODO Think about how to make a plugin to solve this
 
@@ -40,7 +41,8 @@ This format can accept a [wider variety](https://developer.mozilla.org/en-US/doc
 The basic form is a link, where the name is a category (or assignee) and the date replaces the URL section. The TODO content just follows after.
 
 ```
-I take a lot of notes about various things. It can be helpful to keep my TODOs together with the content they pertain to.
+I take a lot of notes about various things. It can be helpful to
+keep my TODOs together with the content they pertain to.
 
 [TODO]() Think about how to make a plugin to solve this
 
