@@ -1,0 +1,11 @@
+{
+  "extraScripts": [
+    "search.ts",
+    "types.ts",
+    "builder.ts",
+    "settings_tables.ts",
+    "summaryFormatters/table.ts",
+    "summaryFormatters/plain.ts",
+    "summary.ts"
+  ]
+}
