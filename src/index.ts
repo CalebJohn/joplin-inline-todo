@@ -37,7 +37,6 @@ joplin.plugins.register({
 				options: regexTitles,
 				section: 'settings.calebjohn.todo',
 				public: true,
-				advanced: true,
 				label: 'Choose the inline TODO style (default is recommended)',
 			},
 			'summaryType': {

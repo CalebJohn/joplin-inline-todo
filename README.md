@@ -1,24 +1,99 @@
-# Joplin Plugin
+# Inline TODOs
+A plugin that allows you to manage your TODOs anywhere in your notes and view a summary in one place.
 
-This is a template to create a new Joplin plugin.
+This plugin was initially written before the plugin system and interacted with Joplin through the API. I've been using it like that for the last few years. I finally took the time to translate it into the official Plugin system. Its implementation is pretty specific to my workflow and I don't plan to update it much, as it works for me.
 
-The main two files you will want to look at are:
 
-- `/src/index.ts`, which contains the entry point for the plugin source code.
-- `/src/manifest.json`, which is the plugin manifest. It contains information such as the plugin a name, version, etc.
+# Installation
+- Go to `Tools -> Options -> Plugins`
+- Search for "Inline TODO" in the search box
+- Click Install and restart Joplin
 
-## Building the plugin
 
-The plugin is built using Webpack, which creates the compiled code in `/dist`. A JPL archive will also be created at the root, which can use to distribute the plugin.
+# Configuration
+## TODO Types
+There are two supported TODO (regex) types.
 
-To build the plugin, simply run `npm run dist`.
+### List Style
+Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
+This format does have the limitation that it only accepts dates of the form YYYY-MM-DD.
 
-The project is setup to use TypeScript, although you can change the configuration to use plain JavaScript.
+The basic form is a checkbox, followed by @category (this can be anything, including an assignee), followed by an optional date (prefixed with //), and finally the TODO content.
 
-## Updating the plugin framework
+```
+I take a lot of notes about various things. It can be helpful to keep my TODOs together with the content they pertain to.
 
-To update the plugin framework, run `npm run update`.
+- [ ] @TODO Think about how to make a plugin to solve this
 
-In general this command tries to do the right thing - in particular it's going to merge the changes in package.json and .gitignore instead of overwriting. It will also leave "/src" as well as README.md untouched.
+This way the TODO benefits from context.
 
-The file that may cause problem is "webpack.config.js" because it's going to be overwritten. For that reason, if you want to change it, consider creating a separate JavaScript file and include it in webpack.config.js. That way, when you update, you only have to restore the line that include your file.
+- [ ] @TODO //2022-03-12 Release the TODO plugin!
+
+I'd still like a way to view all these! See below.
+```
+
+
+### Link Style
+This is a simple TODO style that I've been using for the last few years. It intentionally uses the markdown link syntax which gives it highlighting in the editor and the viewer.
+This format can accept a [wider variety](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse#date_time_string_format) of date formats.
+
+The basic form is a link, where the name is a category (or assignee) and the date replaces the URL section. The TODO content just follows after.
+
+```
+I take a lot of notes about various things. It can be helpful to keep my TODOs together with the content they pertain to.
+
+[TODO]() Think about how to make a plugin to solve this
+
+This way the TODO benefits from context.
+
+[TODO](2022-03-12) Release the TODO plugin!
+
+I'd still like a way to view all these! See below.
+```
+
+
+## Summary Types
+There are two supported summary styles.
+
+### Plain
+This is the basic style that I created for myself, and have been using for the last few years. 
+
+It starts by showing all the TODOs that have dates under the DUE section (sorted by date). After that, all the other TODOs are shown in no specific order under their respective category and parent notebook.
+
+This style is meant for personal use, the table method (below) is recommended for more complex use.
+
+```
+# DUE
+- [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a): 2022-01-13 Have some me time
+
+- [Note b](:/beef7ed6d91649149751cea8d14af02d): 2022-03-12 Meat delivery
+
+# Bob
+## Folder 2
+- [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e): Call Teddy
+
+# Linda
+## Folder 1
+- [Note b](:/beef7ed6d91649149751cea8d14af02d): I'll get to this eventually
+```
+
+### Table
+This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846).
+
+```
+| Task | Assignee | Due | Notebook | Note |
+| ---- | -------- | --- | -------- | ---- |
+| Have some me time | Linda | 2022-01-13 | Folder 3 | [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a)
+| Call Teddy | Bob |  | Folder 2 | [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e)
+| I'll get to this eventually | Linda |  | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
+| Meat delivery | Bob | 2022-03-12 | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
+```
+
+
+# Roadmap
+I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.
+### Ideas
+- [ ] More robust date handling for List style TODO
+- [ ] Add in the fuzzy date handling (e.g. mid april)
+- [ ] Add a renderer component that ids (so we can scroll to TODOs)
+
