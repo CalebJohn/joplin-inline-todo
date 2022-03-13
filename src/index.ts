@@ -1,7 +1,7 @@
 import joplin from 'api';
 import { MenuItemLocation, SettingItemType } from 'api/types';
 import { SummaryBuilder } from './builder';
-import { Note, Settings, Todo } from './types';
+import { Note, Settings, Todo, ItemChangeEvent, ItemChangeEventType } from './types';
 import { update_summary } from './summary';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 
@@ -72,37 +72,28 @@ joplin.plugins.register({
 			},
 		});
 
-		const builder = new SummaryBuilder();
+		const builder = new SummaryBuilder(await getSettings());
 		// Make sure everything is up to date on start
 		// This is purposefully run in the background 
-		builder.check_all(await getSettings());
-
-		let prevNote = await joplin.workspace.selectedNote();
-		let noteDirty = false;
+		builder.search_in_all();
 
 		await joplin.settings.onChange(async (event) => {
+			builder.settings = await getSettings();
+
 			if (event.keys.includes('regexType')) {
 				// This is purposefully run in the background 
-				builder.check_all(await getSettings());
+				builder.search_in_all();
 			} else if (event.keys.includes('summaryType')) {
-				await update_summary(builder.summary, await getSettings());
+				await update_summary(builder.summary, builder.settings);
 			}
 		});
 
-		await joplin.workspace.onNoteChange(async (_event) => {
-			noteDirty = true;
-			prevNote = await joplin.workspace.selectedNote();
-		});
-		await joplin.workspace.onSyncComplete(async () => {
-			// This is purposefully run in the background 
-			builder.check_all(await getSettings());
-		});
 		await joplin.workspace.onNoteSelectionChange(async () => {
-			if (noteDirty) {
-				noteDirty = false;
-				const settings = await getSettings();
-				await builder.search_in_note(prevNote, settings);
-			}
+			await builder.search_in_changed();
+		});
+
+		await joplin.workspace.onSyncComplete(async () => {
+			await builder.search_in_changed();
 		});
 	},
 });

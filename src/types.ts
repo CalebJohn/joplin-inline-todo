@@ -30,3 +30,16 @@ export interface TitleEntry {
 
 // Record<string, Todo[]>;
 export type Summary = Record<string, Todo[]>;
+
+
+// Copied from api/JoplinWorkspace.d
+export enum ItemChangeEventType {
+    Create = 1,
+    Update = 2,
+    Delete = 3
+}
+// Copied from api/JoplinWorkspace.d
+export interface ItemChangeEvent {
+    id: string;
+    event: ItemChangeEventType;
+}
