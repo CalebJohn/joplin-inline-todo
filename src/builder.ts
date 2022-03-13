@@ -34,7 +34,7 @@ export class SummaryBuilder {
 		// there won't be any data loss
 		let folder = await this.get_parent_title(note.parent_id);
 		let match;
-		while ((match = this._settings.todo_regex.exec(note.body)) !== null) {
+		while ((match = this._settings.todo_type.regex.exec(note.body)) !== null) {
 			matches.push({
 				note: note.id,
 				note_title: note.title,
@@ -90,12 +90,17 @@ export class SummaryBuilder {
 		// Because we're checking all, the current queued events will become stale, but events 
 		// that happen during the scanning might not be stale, so we set a checkpoint here
 		this.fast_forward_events();
+		this._summary = {};
 		let todos = {};
 		let page = 0;
 		let r;
 		do {
 			page += 1;
-			r = await joplin.data.get(['notes'], { fields: ['id', 'body', 'title', 'parent_id'], page: page });
+			// I don't know how the basic search is implemented, it could be that it runs a regex
+			// query on each note under the hood. If that is the case and this behaviour crushed
+			// some slow clients, I should consider reverting this back to searching all notes
+			// (with the rate limiter)
+			r = await joplin.data.get(['search'], { query: this._settings.todo_type.query,  fields: ['id', 'body', 'title', 'parent_id'], page: page });
 			if (r.items) {
 				for (let note of r.items) {
 					await this.search_in_note(note, false);

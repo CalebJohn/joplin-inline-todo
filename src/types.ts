@@ -16,11 +16,17 @@ export interface Todo {
 	date?: string;
 }
 
+interface RegexEntry {
+	title: string;
+	regex: RegExp;
+	query: string;
+}
+
 export interface Settings {
 	summary_id?: string;
 	scan_period_s: number;
 	scan_period_c: number;
-	todo_regex: RegExp;
+	todo_type: RegexEntry;
 	summary_type: string;
 }
 

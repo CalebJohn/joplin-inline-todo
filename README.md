@@ -38,7 +38,7 @@ I'd still like a way to view all these! See below.
 This is a simple TODO style that I've been using for the last few years. It intentionally uses the markdown link syntax which gives it highlighting in the editor and the viewer.
 This format can accept a [wider variety](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date/parse#date_time_string_format) of date formats.
 
-The basic form is a link, where the name is a category (or assignee) and the date replaces the URL section. The TODO content just follows after.
+The basic form is a link, where the name is "TODO" and the date replaces the URL section. The TODO content just follows after.
 
 ```
 I take a lot of notes about various things. It can be helpful to

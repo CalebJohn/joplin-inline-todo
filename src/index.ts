@@ -10,7 +10,7 @@ async function getSettings(): Promise<Settings> {
 	return {
 		scan_period_s: await joplin.settings.value('scanPeriod'),
 		scan_period_c: await joplin.settings.value('scanPeriodRequestCount'),
-		todo_regex: regexes[await joplin.settings.value('regexType')].regex,
+		todo_type: regexes[await joplin.settings.value('regexType')],
 		summary_type: await joplin.settings.value('summaryType'),
 		summary_id: await joplin.settings.value('summaryNoteId'),
 	};

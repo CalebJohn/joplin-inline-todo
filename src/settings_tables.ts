@@ -21,13 +21,15 @@ export const summaries = {
 // To add a new regex simple define one below
 // The title is what will appear in the settings menu
 export const regexes = {
-	link: { 
-		title: 'Link Style',
-		regex: /\[(TODO|DUE)\]\((.*?)\)([^\n]+)$/gmi,
-	},
 	list: {
 		title: 'List Style',
 		regex: /^- \[ \] @([^\s\/]*).(?:\/\/(\d\d\d\d-\d\d-\d\d) )?([^\n]*)?$/gm,
+		query: '/"- [ ] @"',
+	},
+	link: {
+		title: 'Link Style',
+		regex: /\[(TODO)\]\((.*?)\)([^\n]+)$/gmi,
+		query: '/"[TODO]"',
 	},
 }
 
