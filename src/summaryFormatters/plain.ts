@@ -18,13 +18,14 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 			if (todo.date) {
 				due.push(todo);
 			} else {
-				if (!(todo.assignee in summary)) {
-					summary[todo.assignee] = {};
+				const assignee = todo.assignee.toUpperCase();
+				if (!(assignee in summary)) {
+					summary[assignee] = {};
 				}
-				if (!(todo.parent_title in summary[todo.assignee])) {
-					summary[todo.assignee][todo.parent_title] = [];
+				if (!(todo.parent_title in summary[assignee])) {
+					summary[assignee][todo.parent_title] = [];
 				}
-				summary[todo.assignee][todo.parent_title].push(todo);
+				summary[assignee][todo.parent_title].push(todo);
 			}
 		}
 	}
