@@ -4,6 +4,7 @@ import { SummaryBuilder } from './builder';
 import { Note, Settings, Todo, ItemChangeEvent, ItemChangeEventType } from './types';
 import { update_summary } from './summary';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
+import { create_summary_note } from './summary_note';
 
 
 async function getSettings(): Promise<Settings> {
@@ -12,7 +13,6 @@ async function getSettings(): Promise<Settings> {
 		scan_period_c: await joplin.settings.value('scanPeriodRequestCount'),
 		todo_type: regexes[await joplin.settings.value('regexType')],
 		summary_type: await joplin.settings.value('summaryType'),
-		summary_id: await joplin.settings.value('summaryNoteId'),
 	};
 }
 
@@ -23,13 +23,6 @@ joplin.plugins.register({
 			iconName: 'fa fa-check'
 		});
 		await joplin.settings.registerSettings({
-			'summaryNoteId': {
-				value: '',
-				type: SettingItemType.String,
-				section: 'settings.calebjohn.todo',
-				public: false,
-				label: '',
-			},
 			'regexType': {
 				value: 'list',
 				type: SettingItemType.String,
@@ -71,6 +64,20 @@ joplin.plugins.register({
 				label: 'Scan Period Allowed Requests',
 			},
 		});
+
+		await joplin.commands.register({
+			name: "inlineTodo.createSummaryNote",
+			label: "Create TODO Summary Note",
+			execute: async () => {
+				await create_summary_note();
+			},
+		});
+
+		await joplin.views.menuItems.create(
+			"createSummaryNoteMenuTools",
+			"inlineTodo.createSummaryNote",
+			MenuItemLocation.Tools
+		);
 
 		const builder = new SummaryBuilder(await getSettings());
 		// Make sure everything is up to date on start

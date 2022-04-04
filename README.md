@@ -3,11 +3,11 @@ A plugin that allows you to manage your TODOs anywhere in your notes and view a 
 
 This plugin was initially written before the plugin system and interacted with Joplin through the API. I've been using it like that for the last few years. I finally took the time to translate it into the official Plugin system. Its implementation is pretty specific to my workflow and I don't plan to update it much, as it works for me.
 
-
 # Installation
 - Go to `Tools -> Options -> Plugins`
 - Search for "Inline TODO" in the search box
 - Click Install and restart Joplin
+- Create a Todo Summary in your folder of choice (Tools -> Create TODO Summary Note)
 
 
 # Configuration
@@ -97,5 +97,5 @@ I consider this plugin to be finished (it meets my needs). But below are some id
 ### Ideas
 - [ ] More robust date handling for List style TODO
 - [ ] Add in the fuzzy date handling (e.g. mid april)
-- [ ] Add a renderer component that ids (so we can scroll to TODOs)
+- [ ] Add a renderer component that adds html ids (so we can scroll to TODOs)
 
