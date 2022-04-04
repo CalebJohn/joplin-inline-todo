@@ -12,9 +12,7 @@ This plugin was initially written before the plugin system and interacted with J
 
 # Configuration
 ## TODO Types
-There are two supported TODO (regex) types.
-
-### List Style
+### Confluence Style
 Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
 This format does have the limitation that it only accepts dates of the form YYYY-MM-DD.
 
@@ -28,7 +26,7 @@ keep my TODOs together with the content they pertain to.
 
 This way the TODO benefits from context.
 
-- [ ] @TODO //2022-03-12 Release the TODO plugin!
+- [ ] @TODO //2022-04-04 Release the TODO plugin!
 
 I'd still like a way to view all these! See below.
 ```
@@ -48,7 +46,23 @@ keep my TODOs together with the content they pertain to.
 
 This way the TODO benefits from context.
 
-[TODO](2022-03-12) Release the TODO plugin!
+[TODO](2022-04-04) Release the TODO plugin!
+
+I'd still like a way to view all these! See below.
+```
+
+### List Style
+This style just uses markdown checklist items. What sets this apart from the Confluence style is the lack of support for categories and dates in this style. This style was created for users that are already happy using plain checklists for their tasks, but want an additional place to collect them. For most users, I recommend the Confluence style instead.
+
+```
+I take a lot of notes about various things. It can be helpful to
+keep my TODOs together with the content they pertain to.
+
+- [ ] Think about how to make a plugin to solve this
+
+This way the TODO benefits from context.
+
+- [ ] Release the TODO plugin!
 
 I'd still like a way to view all these! See below.
 ```

@@ -42,7 +42,9 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 
 	// The rest of the "assignees"
 	for (const [assignee, folders] of Object.entries(summary)) {
-		summaryBody += `# ${assignee}\n`;
+		if (assignee) {
+			summaryBody += `# ${assignee}\n`;
+		}
 		for (const [folder, todos] of Object.entries(folders)) {
 			summaryBody += `## ${folder}\n`;
 			for (let todo of todos) {

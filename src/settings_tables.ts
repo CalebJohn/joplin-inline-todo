@@ -22,7 +22,7 @@ export const summaries = {
 // The title is what will appear in the settings menu
 export const regexes = {
 	list: {
-		title: 'List Style',
+		title: 'Confluence Style',
 		regex: /^- \[ \] @([^\s\/]*).(?:\/\/(\d\d\d\d-\d\d-\d\d) )?([^\n]*)?$/gm,
 		query: '/"- [ ] @"',
 	},
@@ -30,6 +30,11 @@ export const regexes = {
 		title: 'Link Style',
 		regex: /\[(TODO)\]\((.*?)\)([^\n]+)$/gmi,
 		query: '/"[TODO]"',
+	},
+	plain: {
+		title: 'List Style',
+		regex: /^- \[ \] ()()([^\n]*)$/gm,
+		query: '/"- [ ]"',
 	},
 }
 
