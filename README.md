@@ -112,4 +112,6 @@ I consider this plugin to be finished (it meets my needs). But below are some id
 - [ ] More robust date handling for List style TODO
 - [ ] Add in the fuzzy date handling (e.g. mid april)
 - [ ] Add a renderer component that adds html ids (so we can scroll to TODOs)
+- [ ] Add support for the [Metis plugin](https://github.com/hieuthi/joplin-plugin-metis) (todo.txt)
+- [ ] [xit format](https://xit.jotaen.net/)
 
