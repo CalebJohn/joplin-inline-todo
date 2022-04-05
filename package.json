@@ -1,5 +1,5 @@
 {
-  "name": "joplin-plugin-todo",
+  "name": "joplin-plugin-inline-todo",
   "version": "1.0.0",
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
@@ -11,7 +11,7 @@
   },
   "license": "MIT",
   "keywords": [
-    "joplin-plugin"
+    "joplin-plugin", "todo"
   ],
   "devDependencies": {
     "@types/node": "^14.0.14",
