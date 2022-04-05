@@ -10,6 +10,7 @@
     "version": "sed -i '/\\\"version\\\": \\\"/s/[^\\\"]*\\\",/'\"$npm_package_version\\\",/\" src/manifest.json && git add src/manifest.json"
   },
   "license": "MIT",
+	"homepage": "https://github.com/CalebJohn/joplin-inline-todo#readme",
   "keywords": [
     "joplin-plugin", "todo"
   ],
