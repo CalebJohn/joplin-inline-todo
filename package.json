@@ -1,6 +1,6 @@
 {
   "name": "joplin-plugin-inline-todo",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dist": "webpack --joplin-plugin-config buildMain && webpack --joplin-plugin-config buildExtraScripts && webpack --joplin-plugin-config createArchive",
     "prepare": "npm run dist",
@@ -10,9 +10,10 @@
     "version": "sed -i '/\\\"version\\\": \\\"/s/[^\\\"]*\\\",/'\"$npm_package_version\\\",/\" src/manifest.json && git add src/manifest.json"
   },
   "license": "MIT",
-	"homepage": "https://github.com/CalebJohn/joplin-inline-todo#readme",
+  "homepage": "https://github.com/CalebJohn/joplin-inline-todo#readme",
   "keywords": [
-    "joplin-plugin", "todo"
+    "joplin-plugin",
+    "todo"
   ],
   "devDependencies": {
     "@types/node": "^14.0.14",
