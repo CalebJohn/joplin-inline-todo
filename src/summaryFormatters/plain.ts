@@ -8,6 +8,11 @@ function formatTodo(todo: Todo): string {
 	}
 }
 
+// Create a string by concating some Note fields, this will determine sort order
+function sortString(todo: Todo): string {
+	return todo.note_title + todo.msg + todo.note;
+}
+
 export async function plainBody(summary_map: Summary, _settings: Settings) {
 	let summaryBody = '';
 	let summary: Record<string, Record<string, Todo[]>> = {};
@@ -46,8 +51,10 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 		if (assignee) {
 			summaryBody += `# ${assignee}\n`;
 		}
-		for (const [folder, todos] of Object.entries(folders)) {
+		const fentries = Object.entries(folders).sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'accent', numeric: true }));
+		for (const [folder, tds] of fentries) {
 			summaryBody += `## ${folder}\n`;
+			const todos = tds.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
 			for (let todo of todos) {
 				summaryBody += formatTodo(todo) + '\n';
 			}

@@ -5,15 +5,23 @@ function formatTodo(todo: Todo): string {
 	return `| ${todo.msg} | ${todo.assignee} | ${date} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note}) |\n`;
 }
 
+// Create a string by concating some Note fields, this will determine sort order
+function sortString(todo: Todo): string {
+	return todo.assignee + todo.parent_title + todo.note_title + todo.msg + todo.note;
+}
+
 export async function tableBody(summary_map: Summary, _settings: Settings) {
 	let summaryBody = '| Task | Assignee | Due | Notebook | Note |\n';
 	summaryBody += '| ---- | -------- | --- | -------- | ---- |\n';
 
-	const entries = Object.entries(summary_map).sort((a, b) => a[1][0].assignee.localeCompare(b[1][0].assignee, undefined, { sensitivity: 'accent', numeric: true }));
-	for (const [id, todos] of entries) {
-		for (let todo of todos) {
-			summaryBody += formatTodo(todo);
-		}
+	let todos = []
+	for (const [id, tds] of Object.entries(summary_map)) {
+		todos = todos.concat(tds)
+	}
+
+	todos = todos.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
+	for (let todo of todos) {
+		summaryBody += formatTodo(todo);
 	}
 
 	if (!summaryBody) {
