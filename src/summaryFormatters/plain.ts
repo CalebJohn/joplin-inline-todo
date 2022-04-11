@@ -40,8 +40,9 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 		delete summary["DUE"];
 	}
 
+	const entries = Object.entries(summary).sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'accent', numeric: true }));
 	// The rest of the "assignees"
-	for (const [assignee, folders] of Object.entries(summary)) {
+	for (const [assignee, folders] of entries) {
 		if (assignee) {
 			summaryBody += `# ${assignee}\n`;
 		}

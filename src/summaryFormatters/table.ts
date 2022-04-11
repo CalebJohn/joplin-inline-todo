@@ -9,7 +9,8 @@ export async function tableBody(summary_map: Summary, _settings: Settings) {
 	let summaryBody = '| Task | Assignee | Due | Notebook | Note |\n';
 	summaryBody += '| ---- | -------- | --- | -------- | ---- |\n';
 
-	for (const [id, todos] of Object.entries(summary_map)) {
+	const entries = Object.entries(summary_map).sort((a, b) => a[1][0].assignee.localeCompare(b[1][0].assignee, undefined, { sensitivity: 'accent', numeric: true }));
+	for (const [id, todos] of entries) {
 		for (let todo of todos) {
 			summaryBody += formatTodo(todo);
 		}
