@@ -26,6 +26,8 @@ export class SummaryBuilder {
 	}
 
 	async search_in_note(note: Note, refresh: boolean=true) {
+		// Conflict notes are duplicates usually
+		if (note.is_conflict) { return; }
 		let matches = [];
 		// This introduces a small risk of a race condition
 		// (If this is waiting, the note.body could become stale, but this function would
@@ -71,7 +73,7 @@ export class SummaryBuilder {
 			if (event.type === ItemChangeEventType.Delete) {
 				delete this._summary[event.item_type];
 			} else {
-				const r = await joplin.data.get(['notes', event.item_id], { fields: ['id', 'body', 'title', 'parent_id'] });
+				const r = await joplin.data.get(['notes', event.item_id], { fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'] });
 				await this.search_in_note(r, false);
 			}
 		}
@@ -100,7 +102,7 @@ export class SummaryBuilder {
 			// query on each note under the hood. If that is the case and this behaviour crushed
 			// some slow clients, I should consider reverting this back to searching all notes
 			// (with the rate limiter)
-			r = await joplin.data.get(['search'], { query: this._settings.todo_type.query,  fields: ['id', 'body', 'title', 'parent_id'], page: page });
+			r = await joplin.data.get(['search'], { query: this._settings.todo_type.query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
 			if (r.items) {
 				for (let note of r.items) {
 					await this.search_in_note(note, false);

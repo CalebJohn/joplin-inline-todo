@@ -4,6 +4,7 @@ export interface Note {
 	body: string;
 	title: string;
 	parent_id: string;
+	is_conflict: boolean;
 }
 
 export interface Todo {
