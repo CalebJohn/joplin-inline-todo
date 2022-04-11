@@ -2,7 +2,7 @@ import { Settings, Todo, Summary } from '../types';
 
 function formatTodo(todo: Todo): string {
 	const date = todo.date ? todo.date : '';
-	return `| ${todo.msg} | ${todo.assignee} | ${date} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note})\n`;
+	return `| ${todo.msg} | ${todo.assignee} | ${date} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note}) |\n`;
 }
 
 export async function tableBody(summary_map: Summary, _settings: Settings) {

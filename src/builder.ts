@@ -25,7 +25,7 @@ export class SummaryBuilder {
 		this._cursor = parseInt(event.cursor);
 	}
 
-	async search_in_note(note: Note, refresh: boolean=true) {
+	async search_in_note(note: Note) {
 		// Conflict notes are duplicates usually
 		if (note.is_conflict) { return; }
 		let matches = [];
@@ -50,9 +50,6 @@ export class SummaryBuilder {
 
 		if (matches.length > 0 || this._summary[note.id]?.length > 0) {
 			this._summary[note.id] = matches;
-			if (refresh && this._initialized) {
-				await update_summary(this._summary, this._settings);
-			}
 		}
 	}
 
@@ -74,7 +71,7 @@ export class SummaryBuilder {
 				delete this._summary[event.item_type];
 			} else {
 				const r = await joplin.data.get(['notes', event.item_id], { fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'] });
-				await this.search_in_note(r, false);
+				await this.search_in_note(r);
 			}
 		}
 
@@ -105,7 +102,7 @@ export class SummaryBuilder {
 			r = await joplin.data.get(['search'], { query: this._settings.todo_type.query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
 			if (r.items) {
 				for (let note of r.items) {
-					await this.search_in_note(note, false);
+					await this.search_in_note(note);
 				}
 			}
 			// This is a rate limiter that prevents us from pinning the CPU
