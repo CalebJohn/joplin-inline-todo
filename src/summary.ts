@@ -24,6 +24,9 @@ async function setSummaryBody(summaryBody: string) {
 	let spl = summaryNote.body.split(/<!-- inline-todo-plugin -->/gm);
 	spl[0] = summaryBody;
 	const body = spl.join("\n<!-- inline-todo-plugin -->");
+	// Only update the note if it actually changed...
+	if (summaryNote.body === body) { return; }
+
 	await joplin.data.put(['notes', summary_id], null, { body: body });
 
 	// https://github.com/laurent22/joplin/issues/5955
