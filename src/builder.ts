@@ -25,7 +25,7 @@ export class SummaryBuilder {
 		this._cursor = parseInt(event.cursor);
 	}
 
-	async search_in_note(note: Note) {
+	async search_in_note(note: Note): Promise<boolean> {
 		// Conflict notes are duplicates usually
 		if (note.is_conflict) { return; }
 		let matches = [];
@@ -49,14 +49,22 @@ export class SummaryBuilder {
 		}
 
 		if (matches.length > 0 || this._summary[note.id]?.length > 0) {
+			// Check if the matches actually changed
+			const dirty = JSON.stringify(this._summary[note.id]) != JSON.stringify(matches);
+
 			this._summary[note.id] = matches;
+
+			return dirty;
 		}
+
+		return false;
 	}
 
 	// Update the summary looking at changed notes only (from the /events endpoint)
 	async search_in_changed() {
 		let events = [];
 		let page = 0;
+		let dirty = false;
 		let e;
 		// Collect all recent events
 		do {
@@ -69,15 +77,19 @@ export class SummaryBuilder {
 		for (let event of events) {
 			if (event.type === ItemChangeEventType.Delete) {
 				delete this._summary[event.item_type];
+				dirty = true;
 			} else {
 				const r = await joplin.data.get(['notes', event.item_id], { fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'] });
-				await this.search_in_note(r);
+				dirty = await this.search_in_note(r) || dirty;
 			}
 		}
 
 		// Refresh the summary note if there was events
 		if (events.length > 0) {
-			await update_summary(this._summary, this._settings);
+			// We only want to update the summary if there was a possible change
+			if (dirty) {
+				await update_summary(this._summary, this._settings);
+			}
 			// Update the cursort **AFTER** the summary was written
 			// otherwise we'll continually rescan the summary
 			await this.fast_forward_events();
