@@ -42,7 +42,7 @@ joplin.plugins.register({
 				label: 'Choose a Summary Note Format. Check the project page for examples',
 			},
 			'scanPeriod': {
-				value: 1,
+				value: 2,
 				type: SettingItemType.Int,
 				section: 'settings.calebjohn.todo',
 				public: true,
@@ -50,18 +50,18 @@ joplin.plugins.register({
 				minimum: 0,
 				maximum: 99,
 				step: 1,
-				label: 'Scan Period',
+				label: 'Scan Period (how long to wait between bursts of scanning)',
 			},
 			'scanPeriodRequestCount': {
-				value: 8,
+				value: 30,
 				type: SettingItemType.Int,
 				section: 'settings.calebjohn.todo',
 				public: true,
 				advanced: true,
 				minimum: 1,
-				maximum: 999999,
+				maximum: 100,
 				step: 1,
-				label: 'Scan Period Allowed Requests',
+				label: 'Scan Period Allowed Requests (how many requests to make before taking a rest)',
 			},
 		});
 

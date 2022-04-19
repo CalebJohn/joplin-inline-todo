@@ -71,6 +71,12 @@ export class SummaryBuilder {
 			page += 1;
 			e = await joplin.data.get(['events'], { fields: ['id', 'item_id', 'item_type', 'type'], cursor: this._cursor, page: page });
 			events = events.concat(e.items);
+
+			// This is a rate limiter that prevents us from pinning the CPU
+			if (e.has_more && (page % this._settings.scan_period_c) == 0) {
+				// sleep
+				await new Promise(res => setTimeout(res, this._settings.scan_period_s * 1000));
+			}
 		} while (e.has_more);
 
 		// Rebuild the summary based on the events
