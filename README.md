@@ -9,6 +9,14 @@ This plugin was initially written before the plugin system and interacted with J
 - Click Install and restart Joplin
 - Create a Todo Summary in your folder of choice (Tools -> Create TODO Summary Note)
 
+#### Or
+- Download the [plugin jpl](https://github.com/joplin/plugins/raw/master/plugins/plugin.calebjohn.todo/plugin.jpl)
+- Go to `Tools -> Options -> Plugins`
+- Click on the gear icon and select "Install from file"
+- Select the downloaded jpl file
+- Restart Joplin
+- Create a Todo Summary in your folder of choice (Tools -> Create TODO Summary Note)
+
 
 # Configuration
 ## TODO Types
