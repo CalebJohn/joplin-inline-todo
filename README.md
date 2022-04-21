@@ -4,7 +4,7 @@ A plugin that allows you to manage your TODOs anywhere in your notes and view a 
 This plugin was initially written before the plugin system and interacted with Joplin through the API. I've been using it like that for the last few years. I finally took the time to translate it into the official Plugin system. Its implementation is pretty specific to my workflow and I don't plan to update it much, as it works for me.
 
 # Installation
-- Go to `Tools -> Options -> Plugins`
+- Go to `Tools -> Options -> Plugins`(macOS: Joplin -> Preferences -> Plugins)
 - Search for "Inline TODO" in the search box
 - Click Install and restart Joplin
 - Create a Todo Summary in your folder of choice (Tools -> Create TODO Summary Note)
