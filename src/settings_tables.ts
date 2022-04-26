@@ -23,7 +23,7 @@ export const summaries = {
 export const regexes = {
 	list: {
 		title: 'Confluence Style',
-		regex: /^- \[ \] @([^\s\/]*).(?:\/\/(\d\d\d\d-\d\d-\d\d) )?([^\n]*)?$/gm,
+		regex: /^\s*- \[ \] @([^\s\/]*).(?:\/\/(\d\d\d\d-\d\d-\d\d) )?([^\n]*)?$/gm,
 		query: '/"- [ ] @"',
 	},
 	link: {
@@ -33,7 +33,7 @@ export const regexes = {
 	},
 	plain: {
 		title: 'List Style',
-		regex: /^- \[ \] ()()([^\n]*)$/gm,
+		regex: /^\s*- \[ \] ()()([^\n]*)$/gm,
 		query: '/"- [ ]"',
 	},
 }
