@@ -67,7 +67,7 @@ joplin.plugins.register({
 
 		await joplin.commands.register({
 			name: "inlineTodo.createSummaryNote",
-			label: "Create TODO Summary Note",
+			label: "Create TODO summary note",
 			execute: async () => {
 				await create_summary_note();
 			},
