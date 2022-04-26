@@ -1,7 +1,7 @@
 import joplin from 'api';
 import { MenuItemLocation, SettingItemType } from 'api/types';
 import { SummaryBuilder } from './builder';
-import { Note, Settings, Todo, ItemChangeEvent, ItemChangeEventType } from './types';
+import { Note, Settings, Todo } from './types';
 import { update_summary } from './summary';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 import { create_summary_note } from './summary_note';
@@ -80,27 +80,17 @@ joplin.plugins.register({
 		);
 
 		const builder = new SummaryBuilder(await getSettings());
-		// Make sure everything is up to date on start
-		// This is purposefully run in the background 
-		builder.search_in_all();
 
 		await joplin.settings.onChange(async (event) => {
 			builder.settings = await getSettings();
-
-			if (event.keys.includes('regexType')) {
-				// This is purposefully run in the background 
-				builder.search_in_all();
-			} else if (event.keys.includes('summaryType')) {
-				await update_summary(builder.summary, builder.settings);
-			}
 		});
 
 		await joplin.workspace.onNoteSelectionChange(async () => {
-			await builder.search_in_changed();
-		});
-
-		await joplin.workspace.onSyncComplete(async () => {
-			await builder.search_in_changed();
+			const currentNote = await joplin.workspace.selectedNote()
+			if (currentNote.body.match(/<!-- inline-todo-plugin -->/gm)) {
+				await builder.search_in_all();
+				update_summary(builder.summary, builder.settings, currentNote.id);
+			}
 		});
 	},
 });

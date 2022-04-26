@@ -1,6 +1,5 @@
 import joplin from 'api';
-import { Note, Settings, Todo, Summary, ItemChangeEvent, ItemChangeEventType } from './types';
-import { update_summary } from './summary';
+import { Note, Settings, Todo, Summary } from './types';
 
 export class SummaryBuilder {
 	_summary: Summary = {};
@@ -11,18 +10,9 @@ export class SummaryBuilder {
 	_initialized: boolean = false;
 	// The plugin settings
 	_settings: Settings;
-	// cursor the the /events endpoint (used to track changed notes)
-	_cursor: number = 0;
 
 	constructor (s: Settings) {
 		this._settings = s;
-		this.fast_forward_events();
-	}
-
-	// Set the _cursor to be the current event
-	async fast_forward_events() {
-		const event = await joplin.data.get(['events']);
-		this._cursor = parseInt(event.cursor);
 	}
 
 	async search_in_note(note: Note): Promise<boolean> {
@@ -60,52 +50,8 @@ export class SummaryBuilder {
 		return false;
 	}
 
-	// Update the summary looking at changed notes only (from the /events endpoint)
-	async search_in_changed() {
-		let events;
-		let dirty = false;
-		let page = 0;
-		// Collect all recent events
-		do {
-			events = await joplin.data.get(['events'], { fields: ['id', 'item_id', 'item_type', 'type'], cursor: this._cursor});
-			this._cursor = events.cursor;
-
-			// Rebuild the summary based on the events
-			for (let event of events.items) {
-				if (event.type === ItemChangeEventType.Delete) {
-					delete this._summary[event.item_type];
-					dirty = true;
-				} else {
-					const r = await joplin.data.get(['notes', event.item_id], { fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'] });
-					dirty = await this.search_in_note(r) || dirty;
-				}
-			}
-
-			// Page is only used to keep track of the rate limiter, the cursor handles data fetching
-			page += 1;
-			// This is a rate limiter that prevents us from pinning the CPU
-			if (events.has_more && (page % this._settings.scan_period_c) == 0) {
-				// sleep
-				await new Promise(res => setTimeout(res, this._settings.scan_period_s * 1000));
-			}
-		} while (events.has_more);
-
-		// We only want to update the summary if there was a possible change
-		if (dirty) {
-			await update_summary(this._summary, this._settings);
-		}
-
-		// Also update the cursor **AFTER** the summary is written
-		// otherwise we'll continually rescan the summary (updated the summary generates an 
-		// event that we want to discard)
-		await this.fast_forward_events();
-	}
-
 	// This function scans all notes, but it's rate limited to it from crushing Joplin
 	async search_in_all() {
-		// Because we're checking all, the current queued events will become stale, but events 
-		// that happen during the scanning might not be stale, so we set a checkpoint here
-		this.fast_forward_events();
 		this._summary = {};
 		let todos = {};
 		let page = 0;
@@ -130,7 +76,6 @@ export class SummaryBuilder {
 		} while(r.has_more);
 
 		this._initialized = true;
-		await update_summary(this._summary, this._settings);
 	}
 
 	// Reads a parent title from cache, or uses the joplin api to get a title based on id
