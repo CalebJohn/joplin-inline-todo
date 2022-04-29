@@ -53,7 +53,7 @@ joplin.plugins.register({
 				label: 'Scan Period (how long to wait between bursts of scanning)',
 			},
 			'scanPeriodRequestCount': {
-				value: 180,
+				value: 960,
 				type: SettingItemType.Int,
 				section: 'settings.calebjohn.todo',
 				public: true,
