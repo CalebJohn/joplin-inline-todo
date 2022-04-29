@@ -24,19 +24,18 @@ The basic function of this plugin is to have a single note where you can view al
 ## TODO Types
 ### Confluence Style
 Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
-This format does have the limitation that it only accepts dates of the form YYYY-MM-DD.
 
-The basic form is a checkbox, followed by @category (this can be anything, including an assignee), followed by an optional date (prefixed with //), and finally the TODO content.
+The basic form is a checkbox, followed any (or all) of: @assignee (this is a primary filtering field, so there can only be one), //date, +tags, and finally the TODO content.
 
 ```
 I take a lot of notes about various things. It can be helpful to
 keep my TODOs together with the content they pertain to.
 
-- [ ] @TODO Think about how to make a plugin to solve this
+- [ ] @TODO Think about how to make a plugin to solve this +joplin
 
 This way the TODO benefits from context.
 
-- [ ] @TODO //2022-04-04 Release the TODO plugin!
+- [ ] @TODO +joplin //2022-04-04 Release the TODO plugin!
 
 I'd still like a way to view all these! See below.
 ```
@@ -92,11 +91,11 @@ This style is meant for personal use, the table method (below) is recommended fo
 # DUE
 - [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a): 2022-01-13 Have some me time
 
-- [Note b](:/beef7ed6d91649149751cea8d14af02d): 2022-03-12 Meat delivery
+- [Note b](:/beef7ed6d91649149751cea8d14af02d): 2022-03-12 Meat delivery +burgers
 
 # Bob
 ## Folder 2
-- [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e): Call Teddy
+- [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e): Call Teddy +repairs
 
 # Linda
 ## Folder 1
@@ -107,19 +106,18 @@ This style is meant for personal use, the table method (below) is recommended fo
 This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846).
 
 ```
-| Task | Assignee | Due | Notebook | Note |
-| ---- | -------- | --- | -------- | ---- |
-| Have some me time | Linda | 2022-01-13 | Folder 3 | [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a)
-| Call Teddy | Bob |  | Folder 2 | [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e)
-| I'll get to this eventually | Linda |  | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
-| Meat delivery | Bob | 2022-03-12 | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
+| Task | Assignee | Due | Tags | Notebook | Note |
+| ---- | -------- | --- | ---- | -------- | ---- |
+| Have some me time | Linda | 2022-01-13 |  | Folder 3 | [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a)
+| Call Teddy | Bob |  | repairs | Folder 2 | [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e)
+| I'll get to this eventually | Linda |  |  | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
+| Meat delivery | Bob | 2022-03-12 | burgers | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
 ```
 
 
 # Roadmap
 I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.
 ### Ideas
-- [ ] More robust date handling for List style TODO
 - [ ] Add in the fuzzy date handling (e.g. mid april)
 - [ ] Add a renderer component that adds html ids (so we can scroll to TODOs)
 - [ ] Add support for the [Metis plugin](https://github.com/hieuthi/joplin-plugin-metis) (todo.txt)

@@ -26,15 +26,17 @@ export class SummaryBuilder {
 		// there won't be any data loss
 		let folder = await this.get_parent_title(note.parent_id);
 		let match;
-		while ((match = this._settings.todo_type.regex.exec(note.body)) !== null) {
+		const todo_type = this._settings.todo_type;
+		while ((match = todo_type.regex.exec(note.body)) !== null) {
 			matches.push({
 				note: note.id,
 				note_title: note.title,
 				parent_id: note.parent_id,
 				parent_title: folder,
-				msg: match[3],
-				assignee: match[1],
-				date: match[2],
+				msg: todo_type.msg(match),
+				assignee: todo_type.assignee(match),
+				date: todo_type.date(match),
+				tags: todo_type.tags(match),
 			});
 		}
 

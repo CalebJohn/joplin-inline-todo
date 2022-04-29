@@ -14,13 +14,18 @@ export interface Todo {
 	parent_title: string;
 	msg: string;
 	assignee: string;
-	date?: string;
+	date: string;
+	tags: string[];
 }
 
 interface RegexEntry {
 	title: string;
 	regex: RegExp;
 	query: string;
+	msg: (s: string[]) => string;
+	assignee: (s: string[]) => string;
+	date: (s: string[]) => string;
+	tags: (s: string[]) => string[];
 }
 
 export interface Settings {
