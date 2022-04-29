@@ -118,6 +118,7 @@ This is particularly powerful when combined with hieuthi's [table sorting plugin
 # Roadmap
 I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.
 ### Ideas
+- [ ] Add in support for spaces in the assignee field of the confluence style. This will allow for assignees like @"Caleb John"
 - [ ] Add in the fuzzy date handling (e.g. mid april)
 - [ ] Add a renderer component that adds html ids (so we can scroll to TODOs)
 - [ ] Add support for the [Metis plugin](https://github.com/hieuthi/joplin-plugin-metis) (todo.txt)
