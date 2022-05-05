@@ -63,6 +63,14 @@ joplin.plugins.register({
 				step: 1,
 				label: 'Scan Period Allowed Requests (how many requests to make before taking a rest)',
 			},
+			'styleConfluenceTodos': {
+				value: true,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				advanced: true,
+				label: 'Apply styling to confluence style todos in the markdown renderer (Restart Required).',
+			},
 		});
 
 		await joplin.commands.register({
@@ -93,10 +101,12 @@ joplin.plugins.register({
 			}
 		});
 
-		await joplin.contentScripts.register(
-			ContentScriptType.MarkdownItPlugin,
-			'conference_style_renderer',
-			'./todoRender/index.js'
-		);
+		if (await joplin.settings.value('styleConfluenceTodos')) {
+			await joplin.contentScripts.register(
+				ContentScriptType.MarkdownItPlugin,
+				'conference_style_renderer',
+				'./todoRender/index.js'
+			);
+		}
 	},
 });
