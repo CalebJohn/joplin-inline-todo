@@ -5,6 +5,9 @@
     "settings_tables.ts",
     "summaryFormatters/table.ts",
     "summaryFormatters/plain.ts",
-    "summary.ts"
+    "summary.ts",
+
+    "todoRender/index.ts",
+    "todoRender/conferenceStyleRender.ts"
   ]
 }
