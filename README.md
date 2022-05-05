@@ -103,7 +103,7 @@ This style is meant for personal use, the table method (below) is recommended fo
 ```
 
 ### Table
-This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846).
+This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!)
 
 ```
 | Task | Assignee | Due | Tags | Notebook | Note |
