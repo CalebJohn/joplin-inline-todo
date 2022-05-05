@@ -11,6 +11,7 @@ export function conferenceStyleRender(markdownIt, _options) {
             const token = tokens[idx];
             let result = defaultRender(tokens, idx, options, env, self);
 
+            // todo: optimize the implementation. Or each string needs to be visited for 4x times
             let assignee = result.match(/@\S*/);
             if (assignee) {
                 result = result.replace(assignee[0], `[${assignee[0]}]`);
