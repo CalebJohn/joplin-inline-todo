@@ -1,5 +1,5 @@
 import joplin from 'api';
-import { MenuItemLocation, SettingItemType } from 'api/types';
+import {ContentScriptType, MenuItemLocation, SettingItemType} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Note, Settings, Todo } from './types';
 import { update_summary } from './summary';
@@ -92,5 +92,11 @@ joplin.plugins.register({
 				update_summary(builder.summary, builder.settings, currentNote.id);
 			}
 		});
+
+		await joplin.contentScripts.register(
+			ContentScriptType.MarkdownItPlugin,
+			'conference_style_renderer',
+			'./todoRender/index.js'
+		);
 	},
 });
