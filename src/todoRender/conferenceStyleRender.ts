@@ -44,14 +44,24 @@ export function conferenceStyleRender(markdownIt, _options) {
                     let keywords = result.substr(keywordBegin, length);
                     switch (result[keywordBegin]) {
                         case '@':
-                            modifiedResult += `<span class="inline-todo inline-todo-assignee">${keywords}</span>`;
+                            if (keywords.length > 1) {
+                                modifiedResult += `<span class="inline-todo inline-todo-assignee">${keywords}</span>`;
+                            } else {
+                                modifiedResult += keywords;
+                            }
                             break;
                         case '+':
-                            modifiedResult += `<span class="inline-todo inline-todo-tag tag tag-right">${keywords}</span>`;
+                            if (keywords.length > 1) {
+                                modifiedResult += `<span class="inline-todo inline-todo-tag tag tag-right">${keywords}</span>`;
+                            } else {
+                                modifiedResult += keywords;
+                            }
                             break;
                         case '/':
                             if (keywords.length > 2) {
                                 modifiedResult += `<span class="inline-todo inline-todo-date">${keywords.substr(2)}</span>`;
+                            } else {
+                                modifiedResult += keywords;
                             }
                             break;
                         default:
