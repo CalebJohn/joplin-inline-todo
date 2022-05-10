@@ -8,25 +8,70 @@ export function conferenceStyleRender(markdownIt, _options) {
             && tokens[tokens.length - 1].type === "checkbox_wrapper_close") {
             let result = defaultRender(tokens, idx, options, env, self);
 
-            // todo: optimize the implementation. Or each string needs to be visited for 4x times
-            let assignee = result.match(/@\S*/);
-            if (assignee) {
-                result = result.replace(assignee[0], `<span class="inline-todo inline-todo-assignee">${assignee[0]}</span>`);
-            }
+            let modifiedResult = '';
+            let lastIndex = 0;
+            let inKeywords = false;
+            let keywordBegin = -1;
+            for (let i = 0; i < result.length; ++i) {
+                if (result[i] === '@') {
+                    if (i > 0 && result[i - 1].trim() === '' || i === 0) {
+                        modifiedResult += result.substr(lastIndex, i - lastIndex);
+                        inKeywords = true;
+                        keywordBegin = i;
+                    }
+                } else if (result[i] === '+') {
+                    if (i > 0 && result[i - 1].trim() === '' || i === 0) {
+                        modifiedResult += result.substr(lastIndex, i - lastIndex);
+                        inKeywords = true;
+                        keywordBegin = i;
+                    }
+                } else if (result[i] === '/') {
+                    if (i > 1 && result[i - 2].trim() === '' || i === 1) {
+                        modifiedResult += result.substr(lastIndex, i - 1 - lastIndex);
+                        inKeywords = true;
+                        keywordBegin = i - 1;
+                    }
+                }
 
-            let tags = result.matchAll(/\+\S*/g);
-            if (tags) {
-                for (let tag of tags) {
-                    result = result.replace(tag, `<span class="inline-todo inline-todo-tag tag tag-right">${tag}</span>`);
+                if ((result[i].trim() === '' || i + 1 === result.length) && inKeywords) {
+                    inKeywords = false;
+                    let length = i - keywordBegin;
+                    lastIndex = i;
+                    if (i + 1 === result.length) {
+                        length += 1;
+                        lastIndex = i + 1;
+                    }
+                    let keywords = result.substr(keywordBegin, length);
+                    switch (result[keywordBegin]) {
+                        case '@':
+                            if (keywords.length > 1) {
+                                modifiedResult += `<span class="inline-todo inline-todo-assignee">${keywords}</span>`;
+                            } else {
+                                modifiedResult += keywords;
+                            }
+                            break;
+                        case '+':
+                            if (keywords.length > 1) {
+                                modifiedResult += `<span class="inline-todo inline-todo-tag tag tag-right">${keywords}</span>`;
+                            } else {
+                                modifiedResult += keywords;
+                            }
+                            break;
+                        case '/':
+                            if (keywords.length > 2) {
+                                modifiedResult += `<span class="inline-todo inline-todo-date">${keywords.substr(2)}</span>`;
+                            } else {
+                                modifiedResult += keywords;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
+            modifiedResult += result.substr(lastIndex);
 
-            let date = result.match(/\/\/\S*/);
-            if (date) {
-                result = result.replace(date[0], `<span class="inline-todo inline-todo-date">${date[0].substr(2)}</span>`);
-            }
-
-            return result
+            return modifiedResult;
         } else {
             return defaultRender(tokens, idx, options, env, self);
         }
