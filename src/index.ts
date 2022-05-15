@@ -94,10 +94,11 @@ joplin.plugins.register({
 		});
 
 		await joplin.workspace.onNoteSelectionChange(async () => {
-			const currentNote = await joplin.workspace.selectedNote()
-			if (currentNote.body.match(/<!-- inline-todo-plugin -->/gm)) {
+			const currentNote = await joplin.workspace.selectedNote();
+
+			if (currentNote?.body.match(/<!-- inline-todo-plugin -->/gm)) {
 				await builder.search_in_all();
-				update_summary(builder.summary, builder.settings, currentNote.id);
+				update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
 			}
 		});
 
