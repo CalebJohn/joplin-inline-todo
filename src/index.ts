@@ -50,7 +50,7 @@ joplin.plugins.register({
 				minimum: 0,
 				maximum: 99,
 				step: 1,
-				label: 'Scan Period (how long to wait between bursts of scanning)',
+				label: 'Scan Period (how many seconds to wait between bursts of scanning)',
 			},
 			'scanPeriodRequestCount': {
 				value: 960,
