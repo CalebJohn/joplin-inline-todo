@@ -34,6 +34,7 @@ export interface Settings {
 	scan_period_c: number;
 	todo_type: RegexEntry;
 	summary_type: string;
+	force_sync: boolean;
 }
 
 export interface TitleEntry {

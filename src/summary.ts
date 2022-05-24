@@ -6,10 +6,10 @@ export async function update_summary(summary_map: Summary, settings: Settings, s
 	let bodyFunc = summaries[settings.summary_type].func;
 
 	const summaryBody = await bodyFunc(summary_map, settings);
-	await setSummaryBody(summaryBody, summary_id, old_body);
+	await setSummaryBody(summaryBody, summary_id, old_body, settings);
 }
 
-async function setSummaryBody(summaryBody: string, summary_id: string, old_body: string) {
+async function setSummaryBody(summaryBody: string, summary_id: string, old_body: string, settings: Settings) {
 	// Preserve the content after the hr
 	let spl = old_body.split(/<!-- inline-todo-plugin -->/gm);
 	spl[0] = summaryBody;
@@ -25,5 +25,8 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 	}
 
 	await joplin.data.put(['notes', summary_id], null, { body: body });
-	await joplin.commands.execute('synchronize');
+
+	if (settings.force_sync) {
+		await joplin.commands.execute('synchronize');
+	}
 }

@@ -13,6 +13,7 @@ async function getSettings(): Promise<Settings> {
 		scan_period_c: await joplin.settings.value('scanPeriodRequestCount'),
 		todo_type: regexes[await joplin.settings.value('regexType')],
 		summary_type: await joplin.settings.value('summaryType'),
+		force_sync: await joplin.settings.value('forceSync'),
 	};
 }
 
@@ -69,7 +70,15 @@ joplin.plugins.register({
 				section: 'settings.calebjohn.todo',
 				public: true,
 				advanced: true,
-				label: 'Apply styling to confluence style todos in the markdown renderer (Restart Required).',
+				label: 'Apply styling to confluence style todos in the markdown renderer (Restart Required)',
+			},
+			'forceSync': {
+				value: true,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				advanced: true,
+				label: 'Force sync after summary not update (Important: do not un-check this)',
 			},
 		});
 
