@@ -29,7 +29,7 @@ export const summaries = {
 export const regexes = {
 	list: {
 		title: 'Confluence Style',
-		regex: /^\s*- \[ \].*\s(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/gm,
+		regex: /^\s*- \[ \]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => {
 			const result = todo[0].match(/(?<=\s@)([^\s]+)/);
