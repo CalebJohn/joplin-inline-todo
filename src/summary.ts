@@ -70,11 +70,13 @@ function parse_summary_line(line: string): string[] {
 async function set_origin_todo(originId: string, msg: string): Promise<boolean> {
 	const origin = await joplin.data.get(['notes', originId], { fields: ['body'] });
 	let lines = origin.body.split('\n');
-	const subMsg = msg.split(' ').slice(1, -1).join(' ');  // omitting date
+	const words = msg.split(' ');
+	const date = words[0];  // search for (potentially) a date separately
+	const subMsg = words.slice(1, -1).join(' ');  // omitting date
 
 	let changed = false;
 	for (let i = 0; i < lines.length; i++) {
-		if (lines[i].includes(msg) || (lines[i].includes(subMsg))) {
+		if (lines[i].includes(subMsg) && (lines[i].includes(date))) {
 			console.log(lines[i]);
 			lines[i] = lines[i].replace('- [ ]', '- [x]');
 			lines[i] = lines[i].replace('[TODO]', '[DONE]');
