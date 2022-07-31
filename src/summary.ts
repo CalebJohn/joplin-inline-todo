@@ -77,10 +77,8 @@ async function set_origin_todo(originId: string, msg: string): Promise<boolean> 
 	let changed = false;
 	for (let i = 0; i < lines.length; i++) {
 		if (lines[i].includes(subMsg) && (lines[i].includes(date))) {
-			console.log(lines[i]);
 			lines[i] = lines[i].replace('- [ ]', '- [x]');
 			lines[i] = lines[i].replace('[TODO]', '[DONE]');
-			console.log(lines[i]);
 			changed = true;
 			break;
 		}
