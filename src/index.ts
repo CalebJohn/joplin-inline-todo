@@ -2,7 +2,7 @@ import joplin from 'api';
 import {ContentScriptType, MenuItemLocation, SettingItemType} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Note, Settings, Todo } from './types';
-import { update_summary } from './summary';
+import { update_summary, mark_current_line_as_done } from './summary';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 import { create_summary_note } from './summary_note';
 
@@ -97,6 +97,21 @@ joplin.plugins.register({
 		);
 
 		const builder = new SummaryBuilder(await getSettings());
+
+		await joplin.commands.register({
+			name: "inlineTodo.markDone",
+			label: "Mark TODO as done",
+			execute: async () => {
+				mark_current_line_as_done(builder);
+			},
+		});
+
+		await joplin.views.menuItems.create(
+			"markDoneMenuTools",
+			"inlineTodo.markDone",
+			MenuItemLocation.EditorContextMenu,
+			{ accelerator: 'Ctrl+Alt+D' }
+		);
 
 		await joplin.settings.onChange(async (event) => {
 			builder.settings = await getSettings();
