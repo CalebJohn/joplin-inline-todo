@@ -1,7 +1,6 @@
 import joplin from 'api';
 import { Settings, Todo, Summary } from './types';
-import { summaries, regexes } from './settings_tables';
-import { plainBody } from './summaryFormatters/plain';
+import { summaries, formats } from './settings_tables';
 import { SummaryBuilder } from './builder';
 
 export async function update_summary(summary_map: Summary, settings: Settings, summary_id: string, old_body: string) {
@@ -36,10 +35,10 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 export async function mark_current_line_as_done(builder: SummaryBuilder) {
 	// try to find a corresponding TODO and set it as complete in its original note 
 	const line = await get_current_line();
-	const [originId, msg] = parse_summary_line(line);
-	if (originId == undefined) { return undefined; }
+	const todo = parse_summary_line(line, builder.summary, builder.settings);
+	if (todo == undefined) { return; }
 
-	if (set_origin_todo(originId, msg)) {
+	if (set_origin_todo(todo, builder.settings)) {
 		// origin was updated, so update the TODO summary
 		const currentNote = await joplin.workspace.selectedNote();
 		await builder.search_in_all();
@@ -58,36 +57,50 @@ async function get_current_line(): Promise<string> {
 	});
 }
 
-function parse_summary_line(line: string): string[] {
-	const origin = (new RegExp(/\[(?<title>[^\[]+)\]\(:\/(?<id>.*)\)/g)).exec(line);
-	if (origin == undefined) { return [undefined, undefined]; }
+function parse_summary_line(line: string, summary_map: Summary, settings: Settings): Todo {
+	const formatTodo = formats[settings.summary_type].func;
 
-	let parse = regexes.list.msg([line]);
-	parse = parse.split(origin.groups.id + '): ')[1];
-	return [origin.groups.id, parse];
-}
-
-async function set_origin_todo(originId: string, msg: string): Promise<boolean> {
-	const origin = await joplin.data.get(['notes', originId], { fields: ['body'] });
-	let lines = origin.body.split('\n');
-	const words = msg.split(' ');
-	const date = words[0];  // search for (potentially) a date separately
-	const subMsg = words.slice(1, -1).join(' ');  // omitting date
-
-	let changed = false;
-	for (let i = 0; i < lines.length; i++) {
-		if (lines[i].includes(subMsg) && (lines[i].includes(date))) {
-			lines[i] = lines[i].replace('- [ ]', '- [x]');
-			lines[i] = lines[i].replace('[TODO]', '[DONE]');
-			changed = true;
-			break;
+	let found = false;
+	for (const [id, todos] of Object.entries(summary_map)) {
+		for (let todo of todos) {
+			if (line == formatTodo(todo).slice(0, -1)) {
+				return todo;
+			}
 		}
 	}
+	return undefined;
+}
 
-	if (changed) {
+async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean> {
+	const origin = await joplin.data.get(['notes', todo.note], { fields: ['body'] });
+	let lines = origin.body.split('\n');
+	const todo_type = await joplin.settings.value('regexType');
+	const parser = settings.todo_type;
+
+	let match;
+	for (let i = 0; i < lines.length; i++) {
+		parser.regex.lastIndex = 0;
+		match = parser.regex.exec(lines[i] + '\n');
+		if (match === null) { continue; }
+
+		if (!((parser.msg(match) == todo.msg) &&
+			(parser.date(match) == todo.date) &&
+			(parser.assignee(match) == todo.assignee) &&
+			(JSON.stringify(parser.tags(match)) == JSON.stringify(todo.tags)))) {
+				continue;
+			}
+
+		if (todo_type == 'link') {
+			lines[i] = lines[i].replace('[TODO]', '[DONE]');
+		} else {
+			lines[i] = lines[i].replace('- [ ]', '- [x]');
+		}
+
 		// edit origin note
-		await joplin.data.put(['notes', originId], null, { body: lines.join('\n') });
-	}
+		await joplin.data.put(['notes', todo.note], null, { body: lines.join('\n') });
 
-	return changed
+		return true;
+		}
+
+	return false
 }

@@ -1,6 +1,6 @@
 import { Settings, Todo, Summary } from '../types';
 
-function formatTodo(todo: Todo): string {
+export function formatTodo(todo: Todo): string {
 	return `| ${todo.msg} | ${todo.assignee} | ${todo.date} | ${todo.tags.join(' ')} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note}) |\n`;
 }
 
