@@ -1,6 +1,6 @@
 import { Settings, Todo, Summary } from '../types';
 
-function formatTodo(todo: Todo): string {
+export function formatTodo(todo: Todo): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
 	if (todo.date) {
 		return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;

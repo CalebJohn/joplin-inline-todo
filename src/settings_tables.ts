@@ -1,6 +1,6 @@
 import { TitleEntry } from './types';
-import { plainBody } from './summaryFormatters/plain';
-import { tableBody } from './summaryFormatters/table';
+import { plainBody, formatTodo as plainFormat } from './summaryFormatters/plain';
+import { tableBody, formatTodo as tableFormat } from './summaryFormatters/table';
 
 
 // To add a new summary format, create a new file in src/summaryFormatters/
@@ -15,6 +15,15 @@ export const summaries = {
 	table: {
 		title: 'Table',
 		func: tableBody,
+	},
+}
+
+export const formats = {
+	plain: {
+		func: plainFormat,
+	},
+	table: {
+		func: tableFormat,
 	},
 }
 
