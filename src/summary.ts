@@ -41,8 +41,10 @@ export async function mark_current_line_as_done(builder: SummaryBuilder) {
 	if (set_origin_todo(todo, builder.settings)) {
 		// origin was updated, so update the TODO summary
 		const currentNote = await joplin.workspace.selectedNote();
-		await builder.search_in_all();
-		update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
+		if (currentNote?.body.match(/<!-- inline-todo-plugin -->/gm)) {
+			await builder.search_in_all();
+			update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
+		}
 	}
 }
 
