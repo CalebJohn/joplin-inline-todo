@@ -1,5 +1,5 @@
 import joplin from 'api';
-import {ContentScriptType, MenuItemLocation, SettingItemType} from 'api/types';
+import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Note, Settings, Todo } from './types';
 import { update_summary, mark_current_line_as_done } from './summary';
@@ -82,6 +82,8 @@ joplin.plugins.register({
 			},
 		});
 
+		const builder = new SummaryBuilder(await getSettings());
+
 		await joplin.commands.register({
 			name: "inlineTodo.createSummaryNote",
 			label: "Create TODO summary note",
@@ -96,8 +98,6 @@ joplin.plugins.register({
 			MenuItemLocation.Tools
 		);
 
-		const builder = new SummaryBuilder(await getSettings());
-
 		await joplin.commands.register({
 			name: "inlineTodo.markDone",
 			label: "Mark TODO as done",
@@ -106,10 +106,32 @@ joplin.plugins.register({
 			},
 		});
 
+		joplin.workspace.filterEditorContextMenu(async (object: any) => {
+			const currentNote = await joplin.workspace.selectedNote();
+
+			if (!currentNote?.body.match(/<!-- inline-todo-plugin -->/gm)) { return object; }
+
+			const newItems: MenuItem[] = [];
+
+			newItems.splice(0, 0, {
+				type: 'separator',
+			});
+
+			newItems.push({
+				label: 'Mark TODO as done',
+				commandName: 'inlineTodo.markDone',
+				commandArgs: [],
+			});
+
+			object.items = object.items.concat(newItems);
+
+			return object;
+		});
+
 		await joplin.views.menuItems.create(
 			"markDoneMenuTools",
 			"inlineTodo.markDone",
-			MenuItemLocation.EditorContextMenu,
+			MenuItemLocation.Note,
 			{ accelerator: 'Ctrl+Alt+D' }
 		);
 
