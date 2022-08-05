@@ -1,8 +1,9 @@
 import joplin from 'api';
 import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType} from 'api/types';
 import { SummaryBuilder } from './builder';
-import { Note, Settings, Todo } from './types';
-import { update_summary, mark_current_line_as_done } from './summary';
+import { Settings } from './types';
+import { isSummary, update_summary } from './summary';
+import { mark_current_line_as_done } from './mark_todo';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 import { create_summary_note } from './summary_note';
 
@@ -102,26 +103,27 @@ joplin.plugins.register({
 			name: "inlineTodo.markDone",
 			label: "Mark TODO as done",
 			execute: async () => {
-				mark_current_line_as_done(builder);
+				const currentNote = await joplin.workspace.selectedNote();
+				if (!isSummary(currentNote)) { return; }
+				mark_current_line_as_done(builder, currentNote);
 			},
 		});
 
 		joplin.workspace.filterEditorContextMenu(async (object: any) => {
 			const currentNote = await joplin.workspace.selectedNote();
+			if (!isSummary(currentNote)) { return object; }
 
-			if (!currentNote?.body.match(/<!-- inline-todo-plugin -->/gm)) { return object; }
-
-			const newItems: MenuItem[] = [];
-
-			newItems.splice(0, 0, {
-				type: 'separator',
-			});
-
-			newItems.push({
-				label: 'Mark TODO as done',
-				commandName: 'inlineTodo.markDone',
-				commandArgs: [],
-			});
+			const newItems: MenuItem[] = [
+				{
+					type: 'separator',
+				},
+				{
+					label: 'Mark TODO as done',
+					accelerator: 'Ctrl+Alt+D',
+					commandName: 'inlineTodo.markDone',
+					commandArgs: [],
+				},
+			];
 
 			object.items = object.items.concat(newItems);
 
@@ -135,14 +137,14 @@ joplin.plugins.register({
 			{ accelerator: 'Ctrl+Alt+D' }
 		);
 
-		await joplin.settings.onChange(async (event) => {
+		await joplin.settings.onChange(async (_) => {
 			builder.settings = await getSettings();
 		});
 
 		await joplin.workspace.onNoteSelectionChange(async () => {
 			const currentNote = await joplin.workspace.selectedNote();
 
-			if (currentNote?.body.match(/<!-- inline-todo-plugin -->/gm)) {
+			if (isSummary(currentNote)) {
 				await builder.search_in_all();
 				update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
 			}

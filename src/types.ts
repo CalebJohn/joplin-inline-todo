@@ -18,6 +18,11 @@ export interface Todo {
 	tags: string[];
 }
 
+interface Toggle {
+	open: string;
+	closed: string;
+}
+
 interface RegexEntry {
 	title: string;
 	regex: RegExp;
@@ -26,6 +31,7 @@ interface RegexEntry {
 	assignee: (s: string[]) => string;
 	date: (s: string[]) => string;
 	tags: (s: string[]) => string[];
+	toggle: Toggle;
 }
 
 export interface Settings {

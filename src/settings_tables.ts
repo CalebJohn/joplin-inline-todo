@@ -11,19 +11,12 @@ export const summaries = {
 	plain: {
 		title: 'Heading/List',
 		func: plainBody,
+		format: plainFormat,
 	},
 	table: {
 		title: 'Table',
 		func: tableBody,
-	},
-}
-
-export const formats = {
-	plain: {
-		func: plainFormat,
-	},
-	table: {
-		func: tableFormat,
+		format: tableFormat,
 	},
 }
 
@@ -61,6 +54,7 @@ export const regexes = {
 
 			return result.trim();
 		},
+		toggle: { open: '- [ ]', closed: '- [x]' },
 	},
 	link: {
 		title: 'Link Style',
@@ -70,6 +64,7 @@ export const regexes = {
 		date: (todo: string[]) => { return todo[2]; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
+		toggle: { open: '- [ ]', closed: '- [x]' },
 	},
 	plain: {
 		title: 'List Style',
@@ -79,6 +74,7 @@ export const regexes = {
 		date: (todo: string[]) => { return ''; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
+		toggle: { open: '[TODO]', closed: '[DONE]' },
 	},
 }
 
