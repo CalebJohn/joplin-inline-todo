@@ -1,7 +1,7 @@
 import { TitleEntry } from './types';
 import { plainBody, formatTodo as plainFormat } from './summaryFormatters/plain';
 import { tableBody, formatTodo as tableFormat } from './summaryFormatters/table';
-
+import { diaryBody, formatTodo as diaryFormat } from './summaryFormatters/diary';
 
 // To add a new summary format, create a new file in src/summaryFormatters/
 // (I suggest copying from table body)
@@ -18,6 +18,11 @@ export const summaries = {
 		func: tableBody,
 		format: tableFormat,
 	},
+	diary: {
+		title: 'No Heading/list',
+		func: diaryBody,
+		format: diaryFormat,
+	},
 }
 
 // To add a new regex simple define one below
@@ -31,7 +36,8 @@ export const summaries = {
 export const regexes = {
 	list: {
 		title: 'Confluence Style',
-		regex: /^\s*- \[ \]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/gm,
+		// change to find completed todo
+		regex: /^\s*- \[[ |x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => {
 			const result = todo[0].match(/(?<=\s@)([^\s]+)/);
@@ -50,11 +56,12 @@ export const regexes = {
 			let result = todo[0].split(/\s@[^\s]+/).join('');
 			result = result.split(/\s\/\/[^\s]+/).join('');
 			result = result.split(/\s\+[^\s]+/).join('');
-			result = result.split(/- \[ \]/).join('');
-
+			result = result.split(/- \[[ |x]\]/).join('');
 			return result.trim();
 		},
 		toggle: { open: '- [ ]', closed: '- [x]' },
+		completed_query: '/"- [x]"',
+		completed: /^\s*- \[x\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/,
 	},
 	link: {
 		title: 'Link Style',
@@ -65,16 +72,49 @@ export const regexes = {
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
 		toggle: { open: '- [ ]', closed: '- [x]' },
+		completed_query: '/"- [x]"',
+		completed: /^\s*- \[x\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/,
 	},
 	plain: {
 		title: 'List Style',
-		regex: /^\s*- \[ \] ()()([^\n]*)$/gm,
+		// change to find completed todo
+		regex: /^\s*- \[[ |x]\] ()()([^\n]*)$/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => { return ''; },
 		date: (todo: string[]) => { return ''; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
 		toggle: { open: '[TODO]', closed: '[DONE]' },
+		completed_query: '/"- [x]"',
+		completed: /^\s*- \[x\] ()()([^\n]*)$/,
+	},
+	mixed: {
+		title: 'Confluenc+List Style',
+		regex: /^\s*- \[[ |x]\] ()()([^\n]*)$/gm,
+		query: '/"- [ ]"',
+		assignee: (todo: string[]) => {
+			const result = todo[0].match(/(?<=\s@)([^\s]+)/);
+			return result ? result[0] : 'Check list';
+		},
+		date: (todo: string[]) => {
+			const result = todo[0].match(/(?<=\s\/\/)([^\s]+)/);
+			return result ? result[0] : '';
+		},
+		tags: (todo: string[]) => {
+			// the /g is important to get multiple results instead of a single match
+			const result = todo[0].match(/(?<=\s\+)[^\s]+/g);
+			return result ? result : [];
+		},
+		msg: (todo: string[]) => {
+			let result = todo[0].split(/\s@[^\s]+/).join('');
+			result = result.split(/\s\/\/[^\s]+/).join('');
+			result = result.split(/\s\+[^\s]+/).join('');
+			result = result.split(/- \[[ |x]\]/).join('');
+			return result.trim();
+		},
+		toggle: { open: '- [ ]', closed: '- [x]' },
+		completed_query: '/"- [x]"',
+		completed: /^\s*- \[x\] ()()([^\n]*)$/,
 	},
 }
 
