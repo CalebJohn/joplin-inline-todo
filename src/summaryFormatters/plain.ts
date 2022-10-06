@@ -67,7 +67,7 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 			}
 		}
 	}
-	if (completed.length > 0) {
+	if (completed.length > 0 && _settings.show_complete_todo) {
 		summaryBody += `# COMPLETED\n`;
 
 		completed.sort((a, b) => { return Date.parse(a.date) - Date.parse(b.date); });

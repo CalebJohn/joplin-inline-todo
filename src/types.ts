@@ -44,6 +44,7 @@ export interface Settings {
 	todo_type: RegexEntry;
 	summary_type: string;
 	force_sync: boolean;
+	show_complete_todo: boolean;
 }
 
 export interface TitleEntry {

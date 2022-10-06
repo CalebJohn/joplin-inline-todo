@@ -15,6 +15,8 @@ async function getSettings(): Promise<Settings> {
 		todo_type: regexes[await joplin.settings.value('regexType')],
 		summary_type: await joplin.settings.value('summaryType'),
 		force_sync: await joplin.settings.value('forceSync'),
+		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
+		
 	};
 }
 
@@ -80,6 +82,14 @@ joplin.plugins.register({
 				public: true,
 				advanced: true,
 				label: 'Force sync after summary not update (Important: do not un-check this)',
+			},
+			'showCompletetodoitems': {
+				value: true,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				advanced: true,
+				label: 'Include complete TODO items in TODO summary (it might take long time/long list)',
 			},
 		});
 

@@ -35,7 +35,7 @@ export async function tableBody(summary_map: Summary, _settings: Settings) {
 		}
 	}
 	
-	if (completed.length > 0) {
+	if (completed.length > 0 && _settings.show_complete_todo) {
 		for (let todo of completed) {
 			summaryBody += formatTodo(todo);
 		}
