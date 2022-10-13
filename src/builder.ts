@@ -37,6 +37,7 @@ export class SummaryBuilder {
 				assignee: todo_type.assignee(match),
 				date: todo_type.date(match),
 				tags: todo_type.tags(match),
+				completed: todo_type.completed.test(match)
 			});
 		}
 
@@ -77,6 +78,27 @@ export class SummaryBuilder {
 			}
 		} while(r.has_more);
 
+		// search completed todo again not to missing the note containing only completed todos
+		// search only if show_complete_todo option is true
+		if (this._settings.show_complete_todo)
+		{
+			page = 0;
+			do {
+				page += 1;
+				r = await joplin.data.get(['search'], { query: this._settings.todo_type.completed_query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
+				if (r.items) {
+					for (let note of r.items) {
+						await this.search_in_note(note);
+					}
+				}
+				
+				// This is a rate limiter that prevents us from pinning the CPU
+				if (r.has_more && (page % this._settings.scan_period_c) == 0) {
+					// sleep
+					await new Promise(res => setTimeout(res, this._settings.scan_period_s * 1000));
+				}
+			} while(r.has_more);
+		}
 		this._initialized = true;
 	}
 

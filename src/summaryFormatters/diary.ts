@@ -1,11 +1,37 @@
 import { Settings, Todo, Summary } from '../types';
 
-export function formatTodo(todo: Todo): string {
+export function formatTodo(todo: Todo, show_folder_note_name:boolean): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
-	if (todo.date) {
-		return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;
-	} else {
-		return `- [${todo.note_title}](:/${todo.note}): ${todo.msg} ${tags}\n`;
+	
+	if(show_folder_note_name)
+	{
+		if (todo.date) {
+			return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;
+		} else {
+			return `- [${todo.note_title}](:/${todo.note}): ${todo.msg} ${tags}\n`;
+		}
+	
+	}
+	else
+	{
+		const regex = /\[.*\]/gi;	
+		if (todo.date) {
+			// show note name if todo name contain link to avoid ugly nested link
+			if ( regex.test(todo.msg) ) {
+				return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;
+			}
+			else {
+				return `- [${todo.msg}](:/${todo.note}): ${todo.date} ${tags}\n`;
+			}
+		}
+		else {
+			if ( regex.test(todo.msg) ) {
+				return `- [${todo.note_title}](:/${todo.note}): ${todo.msg} ${tags}\n`;
+			}
+			else {
+				return `- [${todo.msg}](:/${todo.note}) ${tags}\n`;
+			}
+		}	
 	}
 }
 
@@ -14,11 +40,12 @@ function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
 
-export async function plainBody(summary_map: Summary, _settings: Settings) {
+export async function diaryBody(summary_map: Summary, _settings: Settings) {
 	let summaryBody = '';
 	let summary: Record<string, Record<string, Todo[]>> = {};
 	let due: Todo[] = [];
 	let completed: Todo[] = [];
+
 
 	for (const [id, todos] of Object.entries(summary_map)) {
 		for (let todo of todos) {
@@ -41,12 +68,11 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 			}
 		}
 	}
-	
 	if (due.length > 0) {
 		summaryBody += `# DUE\n`;
 
 		due.sort((a, b) => { return Date.parse(a.date) - Date.parse(b.date); });
-		summaryBody += due.map(formatTodo).join('\n');
+		summaryBody += due.map(td => formatTodo(td, false)).join('\n');
 		summaryBody += '\n';
 
 		delete summary["DUE"];
@@ -60,24 +86,26 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 		}
 		const fentries = Object.entries(folders).sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'accent', numeric: true }));
 		for (const [folder, tds] of fentries) {
-			summaryBody += `## ${folder}\n`;
+			if (false) {
+				summaryBody += `## ${folder}\n`;
+			}
 			const todos = tds.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
 			for (let todo of todos) {
-				summaryBody += formatTodo(todo) + '\n';
+				summaryBody += formatTodo(todo, false) + '\n';
 			}
 		}
 	}
+	
 	if (completed.length > 0 && _settings.show_complete_todo) {
 		summaryBody += `# COMPLETED\n`;
 
 		completed.sort((a, b) => { return Date.parse(a.date) - Date.parse(b.date); });
-		summaryBody += completed.map(formatTodo).join('\n');
+		summaryBody += completed.map(td => formatTodo(td, false)).join('\n');
 		
 		summaryBody += '\n';
 		
 		delete summary["COMPLETED"];
 	}
-	
 
 	if (!summaryBody) {
 		summaryBody = '# All done!\n\n';
