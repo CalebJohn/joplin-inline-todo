@@ -35,11 +35,12 @@ function parse_summary_line(line: string, summary_map: Summary, settings: Settin
 
 	for (const [_, todos] of Object.entries(summary_map)) {
 		for (let todo of todos) {
-			if (line == formatTodo(todo).slice(0, -1)) {
+			if (line.trim() == formatTodo(todo, settings).trim()) {
 				return todo;
 			}
 		}
 	}
+	console.error(`Failed to find the corresponding todo for ${line}`);
 	return undefined;
 }
 
@@ -61,7 +62,12 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 				continue;
 			}
 
-		lines[i] = lines[i].replace(parser.toggle.open, parser.toggle.closed);
+		if (todo.completed) {
+			lines[i] = lines[i].replace(parser.toggle.closed, parser.toggle.open);
+		}
+		else {
+			lines[i] = lines[i].replace(parser.toggle.open, parser.toggle.closed);
+		}
 
 		// edit origin note
 		await joplin.data.put(['notes', todo.note], null, { body: lines.join('\n') });

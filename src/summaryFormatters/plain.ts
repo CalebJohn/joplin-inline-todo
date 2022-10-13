@@ -1,6 +1,6 @@
 import { Settings, Todo, Summary } from '../types';
 
-export function formatTodo(todo: Todo): string {
+export function formatTodo(todo: Todo, _settings: Settings): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
 	if (todo.date) {
 		return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;
@@ -14,7 +14,7 @@ function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
 
-export async function plainBody(summary_map: Summary, _settings: Settings) {
+export async function plainBody(summary_map: Summary, settings: Settings) {
 	let summaryBody = '';
 	let summary: Record<string, Record<string, Todo[]>> = {};
 	let due: Todo[] = [];
@@ -46,7 +46,7 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 		summaryBody += `# DUE\n`;
 
 		due.sort((a, b) => { return Date.parse(a.date) - Date.parse(b.date); });
-		summaryBody += due.map(formatTodo).join('\n');
+		summaryBody += due.map((d) => formatTodo(d, settings)).join('\n');
 		summaryBody += '\n';
 
 		delete summary["DUE"];
@@ -63,15 +63,15 @@ export async function plainBody(summary_map: Summary, _settings: Settings) {
 			summaryBody += `## ${folder}\n`;
 			const todos = tds.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
 			for (let todo of todos) {
-				summaryBody += formatTodo(todo) + '\n';
+				summaryBody += formatTodo(todo, settings) + '\n';
 			}
 		}
 	}
-	if (completed.length > 0 && _settings.show_complete_todo) {
+	if (completed.length > 0 && settings.show_complete_todo) {
 		summaryBody += `# COMPLETED\n`;
 
 		completed.sort((a, b) => { return Date.parse(a.date) - Date.parse(b.date); });
-		summaryBody += completed.map(formatTodo).join('\n');
+		summaryBody += completed.map((d) => formatTodo(d, settings)).join('\n');
 		
 		summaryBody += '\n';
 		

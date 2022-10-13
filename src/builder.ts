@@ -37,7 +37,7 @@ export class SummaryBuilder {
 				assignee: todo_type.assignee(match),
 				date: todo_type.date(match),
 				tags: todo_type.tags(match),
-				completed: todo_type.completed.test(match)
+				completed: todo_type.completed_regex.test(match)
 			});
 		}
 
@@ -53,10 +53,7 @@ export class SummaryBuilder {
 		return false;
 	}
 
-	// This function scans all notes, but it's rate limited to it from crushing Joplin
-	async search_in_all() {
-		this._summary = {};
-		let todos = {};
+	async search_with_query(query: string) {
 		let page = 0;
 		let r;
 		do {
@@ -65,7 +62,7 @@ export class SummaryBuilder {
 			// query on each note under the hood. If that is the case and this behaviour crushed
 			// some slow clients, I should consider reverting this back to searching all notes
 			// (with the rate limiter)
-			r = await joplin.data.get(['search'], { query: this._settings.todo_type.query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
+			r = await joplin.data.get(['search'], { query: query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
 			if (r.items) {
 				for (let note of r.items) {
 					await this.search_in_note(note);
@@ -78,26 +75,19 @@ export class SummaryBuilder {
 			}
 		} while(r.has_more);
 
-		// search completed todo again not to missing the note containing only completed todos
+
+	}
+
+	// This function scans all notes, but it's rate limited to it from crushing Joplin
+	async search_in_all() {
+		this._summary = {};
+		await this.search_with_query(this._settings.todo_type.query);
+
 		// search only if show_complete_todo option is true
 		if (this._settings.show_complete_todo)
 		{
-			page = 0;
-			do {
-				page += 1;
-				r = await joplin.data.get(['search'], { query: this._settings.todo_type.completed_query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page });
-				if (r.items) {
-					for (let note of r.items) {
-						await this.search_in_note(note);
-					}
-				}
-				
-				// This is a rate limiter that prevents us from pinning the CPU
-				if (r.has_more && (page % this._settings.scan_period_c) == 0) {
-					// sleep
-					await new Promise(res => setTimeout(res, this._settings.scan_period_s * 1000));
-				}
-			} while(r.has_more);
+			// search completed todo again not to missing the note containing only completed todos
+			await this.search_with_query(this._settings.todo_type.completed_query);
 		}
 		this._initialized = true;
 	}

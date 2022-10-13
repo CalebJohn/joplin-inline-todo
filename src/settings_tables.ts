@@ -19,7 +19,7 @@ export const summaries = {
 		format: tableFormat,
 	},
 	diary: {
-		title: 'No Heading/list',
+		title: 'List',
 		func: diaryBody,
 		format: diaryFormat,
 	},
@@ -33,6 +33,9 @@ export const summaries = {
 // The date is a function that extracts the date from the todo
 // The tags is a function that extracts the tags from the todo
 // The msg is a function that extracts the message from the todo
+// The toggle is an object that containes the [un]completed state of a todo
+// The completed_query is what will identify a note with a completed todo (Joplin search syntax)
+// The completed_regex is what will identify a line as completed
 export const regexes = {
 	list: {
 		title: 'Confluence Style',
@@ -61,60 +64,40 @@ export const regexes = {
 		},
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
-		completed: /^\s*- \[x\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/,
+		completed_regex: /^\s*- \[x\]\s.*$/,
 	},
 	link: {
 		title: 'Link Style',
-		regex: /\[(TODO)\]\((.*?)\)([^\n]+)$/gmi,
+		regex: /\[((?:TODO)|(?:DONE))\]\((.*?)\)([^\n]+)$/gmi,
 		query: '/"[TODO]"',
 		assignee: (todo: string[]) => { return todo[1]; },
 		date: (todo: string[]) => { return todo[2]; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
-		toggle: { open: '- [ ]', closed: '- [x]' },
-		completed_query: '/"- [x]"',
-		completed: /^\s*- \[x\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/,
+		toggle: { open: '[TODO]', closed: '[DONE]' },
+		completed_query: '/"[DONE]"',
+		completed_regex: /\[DONE\]\(.*?\)([^\n]+)$/,
 	},
 	plain: {
 		title: 'List Style',
-		// change to find completed todo
-		regex: /^\s*- \[[ |x]\] ()()([^\n]*)$/gm,
-		query: '/"- [ ]"',
-		assignee: (todo: string[]) => { return ''; },
-		date: (todo: string[]) => { return ''; },
-		tags: (todo: string[]) => { return []; },
-		msg: (todo: string[]) => { return todo[3]; },
-		toggle: { open: '[TODO]', closed: '[DONE]' },
-		completed_query: '/"- [x]"',
-		completed: /^\s*- \[x\] ()()([^\n]*)$/,
-	},
-	mixed: {
-		title: 'Confluenc+List Style',
 		regex: /^\s*- \[[ |x]\] ()()([^\n]*)$/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => {
-			const result = todo[0].match(/(?<=\s@)([^\s]+)/);
-			return result ? result[0] : 'Check list';
+			const result = regexes.list.assignee(todo);
+			return result || 'Unassigned';
 		},
 		date: (todo: string[]) => {
-			const result = todo[0].match(/(?<=\s\/\/)([^\s]+)/);
-			return result ? result[0] : '';
+			return regexes.list.date(todo);
 		},
 		tags: (todo: string[]) => {
-			// the /g is important to get multiple results instead of a single match
-			const result = todo[0].match(/(?<=\s\+)[^\s]+/g);
-			return result ? result : [];
+			return regexes.list.tags(todo);
 		},
 		msg: (todo: string[]) => {
-			let result = todo[0].split(/\s@[^\s]+/).join('');
-			result = result.split(/\s\/\/[^\s]+/).join('');
-			result = result.split(/\s\+[^\s]+/).join('');
-			result = result.split(/- \[[ |x]\]/).join('');
-			return result.trim();
+			return regexes.list.msg(todo);
 		},
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
-		completed: /^\s*- \[x\] ()()([^\n]*)$/,
+		completed_regex: /^\s*- \[x\]\s.*$/,
 	},
 }
 

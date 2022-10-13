@@ -84,7 +84,7 @@ joplin.plugins.register({
 				label: 'Force sync after summary note update (Important: do not un-check this)',
 			},
 			'showCompletetodoitems': {
-				value: true,
+				value: false,
 				type: SettingItemType.Bool,
 				section: 'settings.calebjohn.todo',
 				public: true,
@@ -111,7 +111,7 @@ joplin.plugins.register({
 
 		await joplin.commands.register({
 			name: "inlineTodo.markDone",
-			label: "Mark TODO as done",
+			label: "Toggle TODO",
 			execute: async () => {
 				const currentNote = await joplin.workspace.selectedNote();
 				if (!isSummary(currentNote)) { return; }
@@ -128,7 +128,7 @@ joplin.plugins.register({
 					type: 'separator',
 				},
 				{
-					label: 'Mark TODO as done',
+					label: 'Toggle TODO',
 					accelerator: 'Ctrl+Alt+D',
 					commandName: 'inlineTodo.markDone',
 					commandArgs: [],

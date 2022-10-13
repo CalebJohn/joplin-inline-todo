@@ -34,7 +34,7 @@ interface RegexEntry {
 	tags: (s: string[]) => string[];
 	toggle: Toggle;
 	completed_query: string;
-	completed: RegExp;	
+	completed_regex: RegExp;
 }
 
 export interface Settings {
