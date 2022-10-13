@@ -81,7 +81,7 @@ joplin.plugins.register({
 				section: 'settings.calebjohn.todo',
 				public: true,
 				advanced: true,
-				label: 'Force sync after summary not update (Important: do not un-check this)',
+				label: 'Force sync after summary note update (Important: do not un-check this)',
 			},
 			'showCompletetodoitems': {
 				value: true,
