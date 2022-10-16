@@ -1,19 +1,20 @@
 import joplin from 'api';
-import { Settings, Note, Summary } from './types';
+import { Settings, Summary } from './types';
 import { summaries } from './settings_tables';
+import { insertNewSummary, filterSummaryCategories } from './summary_note';
 
 export async function update_summary(summary_map: Summary, settings: Settings, summary_id: string, old_body: string) {
 	let bodyFunc = summaries[settings.summary_type].func;
 
-	const summaryBody = await bodyFunc(summary_map, settings);
+	// Use the summary special comment to filter the todos for this summary note
+	const filtered_map = filterSummaryCategories(old_body, summary_map);
+
+	const summaryBody = await bodyFunc(filtered_map, settings);
 	await setSummaryBody(summaryBody, summary_id, old_body, settings);
 }
 
 async function setSummaryBody(summaryBody: string, summary_id: string, old_body: string, settings: Settings) {
-	// Preserve the content after the hr
-	let spl = old_body.split(/<!-- inline-todo-plugin -->/gm);
-	spl[0] = summaryBody;
-	const body = spl.join("\n<!-- inline-todo-plugin -->");
+	const body = insertNewSummary(old_body, summaryBody);
 
 	// Only update the note if it actually changed...
 	if (old_body === body) { return; }
@@ -29,9 +30,5 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 	if (settings.force_sync) {
 		await joplin.commands.execute('synchronize');
 	}
-}
-
-export function isSummary(currentNote: Note): boolean {
-	return !!currentNote?.body.match(/<!-- inline-todo-plugin -->/gm);
 }
 

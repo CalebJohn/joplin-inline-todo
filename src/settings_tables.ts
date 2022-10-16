@@ -9,7 +9,7 @@ import { diaryBody, formatTodo as diaryFormat } from './summaryFormatters/diary'
 // The title is what will appear in the settings menu
 export const summaries = {
 	plain: {
-		title: 'Heading/List',
+		title: 'Assignee/Notebook List',
 		func: plainBody,
 		format: plainFormat,
 	},
@@ -19,7 +19,7 @@ export const summaries = {
 		format: tableFormat,
 	},
 	diary: {
-		title: 'List',
+		title: 'Notebook List',
 		func: diaryBody,
 		format: diaryFormat,
 	},

@@ -114,6 +114,13 @@ This is particularly powerful when combined with hieuthi's [table sorting plugin
 | Meat delivery | Bob | 2022-03-12 | burgers | Folder 1 | [Note b](:/beef7ed6d91649149751cea8d14af02d)
 ```
 
+## Filtering
+Todos can be filtered such that the plugin will only display Todos from specific notebooks. This can be done by adding notebook names inside the special comment. Notebooks that have a space in their name must be quoted. For example, to limit a search to only "Work" and "Special Project" notebooks, replace the default special comment with.
+
+```
+<!-- inline-todo-plugin Work "Special Project" -->
+```
+
 
 # Roadmap
 I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.

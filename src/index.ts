@@ -2,10 +2,10 @@ import joplin from 'api';
 import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Settings } from './types';
-import { isSummary, update_summary } from './summary';
+import { update_summary } from './summary';
 import { mark_current_line_as_done } from './mark_todo';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
-import { create_summary_note } from './summary_note';
+import { createSummaryNote, isSummary } from './summary_note';
 
 
 async function getSettings(): Promise<Settings> {
@@ -99,7 +99,7 @@ joplin.plugins.register({
 			name: "inlineTodo.createSummaryNote",
 			label: "Create TODO summary note",
 			execute: async () => {
-				await create_summary_note();
+				await createSummaryNote();
 			},
 		});
 
