@@ -11,7 +11,11 @@ function summaryString(notebooks: string): string {
 
 export async function createSummaryNote() {
 	const par = await joplin.workspace.selectedFolder()
-	await joplin.data.post(['notes'], null, {title: 'Todo Summary', parent_id: par.id, body: summaryString(' ')});
+	await joplin.data.post(['notes'], null, {title: 'Todo Summary', parent_id: par.id, body: summaryString(' ')})
+			.catch((error) => {
+				console.error(error);
+				console.warn("Could not create summary note with api in notebook: " + par.id);
+			});
 }
 
 export function insertNewSummary(old_body: string, summaryBody: string): string {

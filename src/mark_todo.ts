@@ -12,7 +12,16 @@ export async function mark_current_line_as_done(builder: SummaryBuilder, current
 
 	if (await set_origin_todo(todo, builder.settings)) {
 		// origin was updated, so update the TODO summary
-		const origin = await joplin.data.get(['notes', todo.note], { fields: ['body', 'id', 'title', 'parent_id', 'is_conflict'] });
+		const origin = await joplin.data.get(['notes', todo.note], { fields: ['body', 'id', 'title', 'parent_id', 'is_conflict'] })
+				.catch((error) => {
+					console.error(error);
+					console.warn("Could not read note with api: " + todo.note);
+					return { };
+				});
+		if (!origin.length) {
+			console.error("Could not mark current line as done, see errors above");
+			return;
+		}
 		await builder.search_in_note(origin);
 		update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
 	}
@@ -45,7 +54,16 @@ function parse_summary_line(line: string, summary_map: Summary, settings: Settin
 }
 
 async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean> {
-	const origin = await joplin.data.get(['notes', todo.note], { fields: ['body'] });
+	const origin = await joplin.data.get(['notes', todo.note], { fields: ['body'] })
+			.catch((error) => {
+				console.error(error);
+				console.warn("Could not get note body from api: " + todo.note);
+				return { };
+			});
+	if (!origin.length) {
+		console.error("Could not set the todo origin, see errors above");
+		return;
+	}
 	let lines = origin.body.split('\n');
 	const parser = settings.todo_type;
 
@@ -70,7 +88,11 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 		}
 
 		// edit origin note
-		await joplin.data.put(['notes', todo.note], null, { body: lines.join('\n') });
+		await joplin.data.put(['notes', todo.note], null, { body: lines.join('\n') })
+				.catch((error) => {
+					console.error(error);
+					console.warn("Could not write to note: " + todo.note);
+				});
 
 		return true;
 	}

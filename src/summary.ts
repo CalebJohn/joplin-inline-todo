@@ -25,7 +25,11 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 		await joplin.commands.execute('editor.setText', body);
 	}
 
-	await joplin.data.put(['notes', summary_id], null, { body: body });
+	await joplin.data.put(['notes', summary_id], null, { body: body })
+			.catch((error) => {
+				console.error(error);
+				console.warn("Could not update summary note with api: " + summary_id);
+			});
 
 	if (settings.force_sync) {
 		await joplin.commands.execute('synchronize');
