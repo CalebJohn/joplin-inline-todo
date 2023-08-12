@@ -19,12 +19,15 @@ export class SummaryBuilder {
 		// Conflict notes are duplicates usually
 		if (note.is_conflict) { return; }
 		let matches = [];
+		console.log("search in note " + note.title);
+		console.log(note);
 		// This introduces a small risk of a race condition
 		// (If this is waiting, the note.body could become stale, but this function would
 		// continue anyways and update the summary with stale data)
 		// I don't think this will be an issue in practice, and if it does crop up
 		// there won't be any data loss
 		let folder = await this.get_parent_title(note.parent_id);
+		console.log(note.title + " is in folder " + folder);
 		let match;
 		const todo_type = this._settings.todo_type;
 		while ((match = todo_type.regex.exec(note.body)) !== null) {
