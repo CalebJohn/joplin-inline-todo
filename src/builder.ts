@@ -95,7 +95,14 @@ export class SummaryBuilder {
 	// Reads a parent title from cache, or uses the joplin api to get a title based on id
 	async get_parent_title(id: string): Promise<string> {
 		if (!(id in this._folders)) {
-			let f = await joplin.data.get(['folders', id], { fields: ['title'] });
+			let unknown_folder = "Unknown Folder";
+			let f = await joplin.data.get(['folders', id], { fields: ['title'] })
+					.catch((error) => {
+							console.error(error);
+							console.warn("Could not find folder title for id: " + id);
+							return { title: unknown_folder };
+					})
+			;
 			this._folders[id] = f.title;
 		}
 
