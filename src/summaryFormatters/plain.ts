@@ -3,7 +3,7 @@ import { Settings, Todo, Summary } from '../types';
 export function formatTodo(todo: Todo, _settings: Settings): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
 	if (todo.date) {
-		return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} ${tags}\n`;
+		return `- [${todo.note_title}](:/${todo.note}): ${todo.date} ${todo.msg} @${todo.assignee} ${tags}\n`;
 	} else {
 		return `- [${todo.note_title}](:/${todo.note}): ${todo.msg} ${tags}\n`;
 	}
