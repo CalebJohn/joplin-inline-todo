@@ -1,3 +1,11 @@
+function sameDate(date1, date2) {
+    return (
+      (date1.getUTCFullYear() === date2.getUTCFullYear())
+      && (date1.getUTCMonth() === date2.getUTCMonth())
+      && (date1.getUTCDate() === date2.getUTCDate())
+    );
+}
+
 export function conferenceStyleRender(markdownIt, _options) {
     const defaultRender = markdownIt.renderer.rules.text || function (tokens, idx, options, env, self) {
         return self.renderToken(tokens, idx, options, env, self);
@@ -59,7 +67,19 @@ export function conferenceStyleRender(markdownIt, _options) {
                             break;
                         case '/':
                             if (keywords.length > 2) {
-                                modifiedResult += `<span class="inline-todo inline-todo-date">${keywords.substr(2)}</span>`;
+                                let today = new Date();
+                                let duedate = new Date(keywords.substr(2));
+                                let mod = '';
+                                if (sameDate(today, duedate)) {
+                                    mod = 'due';
+                                }
+                                else if (today < duedate) {
+                                    mod = '';
+                                }
+                                else if (today > duedate) {
+                                    mod = 'overdue';
+                                }
+                                modifiedResult += `<span class="inline-todo inline-todo-date ${mod}">${keywords.substr(2)}</span>`;
                             } else {
                                 modifiedResult += keywords;
                             }

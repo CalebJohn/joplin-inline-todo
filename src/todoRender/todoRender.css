@@ -12,9 +12,15 @@ span.inline-todo-assignee {
 }
 
 span.inline-todo-date {
-    background-color: orange;
+    background-color: #52C41B;
     color: white;
     border-radius: 4px;
+}
+span.inline-todo-date.due {
+    background-color: orange;
+}
+span.inline-todo-date.overdue {
+    background-color: orangered;
 }
 
 span.inline-todo-date::before {
@@ -54,7 +60,7 @@ span.inline-todo-date::before {
 }
 
 .tag-right::after {
-    background: #52C41B;
+    background-color: #52C41B;
     left: 0;
 }
 
