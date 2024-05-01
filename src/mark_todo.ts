@@ -18,7 +18,7 @@ export async function mark_current_line_as_done(builder: SummaryBuilder, current
 					console.warn("Could not read note with api: " + todo.note);
 					return { };
 				});
-		if (!origin.length) {
+		if (!origin) {
 			console.error("Could not mark current line as done, see errors above");
 			return;
 		}
@@ -60,7 +60,7 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 				console.warn("Could not get note body from api: " + todo.note);
 				return { };
 			});
-	if (!origin.length) {
+	if (!origin) {
 		console.error("Could not set the todo origin, see errors above");
 		return;
 	}
