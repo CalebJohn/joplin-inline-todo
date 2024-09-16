@@ -21,6 +21,10 @@ The basic function of this plugin is to have a single note where you can view al
 
 
 # Configuration
+
+ - Tools -> Options -> Inline TODO (Windows/Linux)
+ - Joplin -> Preferences (macOS))
+
 ## TODO Types
 ### Confluence Style
 Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
@@ -103,7 +107,7 @@ This style is meant for personal use, the table method (below) is recommended fo
 ```
 
 ### Table
-This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!)
+This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!).
 
 ```
 | Task | Assignee | Due | Tags | Notebook | Note |
