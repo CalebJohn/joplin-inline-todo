@@ -21,6 +21,10 @@ The basic function of this plugin is to have a single note where you can view al
 
 
 # Configuration
+
+ - Tools -> Options -> Inline TODO (Windows/Linux)
+ - Joplin -> Preferences (macOS))
+
 ## TODO Types
 ### Confluence Style
 Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
@@ -78,7 +82,7 @@ I'd still like a way to view all these! See below.
 
 
 ## Summary Types
-There are two supported summary styles (under Tools -> Options -> Inline TODO (Windows/Linux), Joplin -> Preferences (macOS)).
+There are two supported summary styles.
 
 ### Plain
 This is the basic style that I created for myself, and have been using for the last few years. 
