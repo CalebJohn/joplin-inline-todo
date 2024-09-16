@@ -78,7 +78,7 @@ I'd still like a way to view all these! See below.
 
 
 ## Summary Types
-There are two supported summary styles.
+There are two supported summary styles (under Tools -> Options -> Inline TODO (Windows/Linux), Joplin -> Preferences (macOS)).
 
 ### Plain
 This is the basic style that I created for myself, and have been using for the last few years. 
@@ -103,7 +103,7 @@ This style is meant for personal use, the table method (below) is recommended fo
 ```
 
 ### Table
-This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!)
+This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!).
 
 ```
 | Task | Assignee | Due | Tags | Notebook | Note |
