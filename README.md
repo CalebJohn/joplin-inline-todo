@@ -27,10 +27,11 @@ The basic function of this plugin is to have a single note where you can view al
 
 ## TODO Types
 ### Confluence Style
-Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (making it trivial to check the box and hide the TODO from the summary). 
+Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (plus some special syntax), making it trivial to check the box and hide the TODO from the summary. 
 
-The basic form is a checkbox, followed any (or all) of: @assignee (this is a primary filtering field, so there can only be one), //date, +tags, and finally the TODO content.
+The basic form is a checkbox, followed any (or all) of: @assignee (this is a primary filtering field, so there can only be one), //date, +tags, and finally the TODO content. Having at least on of these special fields is required for the todo to be picked up by the plugin, without them it is just a plain checkbox.
 
+@assignee does not need to be a person, it can also be viewed as a category. It will sometimes affect the rendering of the content by grouping assignees. 
 ```
 I take a lot of notes about various things. It can be helpful to
 keep my TODOs together with the content they pertain to.
