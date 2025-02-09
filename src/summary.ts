@@ -20,10 +20,10 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 	if (old_body === body) { return; }
 
 	// https://github.com/laurent22/joplin/issues/5955
-	const currentNote = await joplin.workspace.selectedNote();
-	if (currentNote.id == summary_id) {
-		await joplin.commands.execute('editor.setText', body);
-	}
+	// const currentNote = await joplin.workspace.selectedNote();
+	// if (currentNote.id == summary_id) {
+	// 	await joplin.commands.execute('editor.setText', body);
+	// }
 
 	await joplin.data.put(['notes', summary_id], null, { body: body })
 			.catch((error) => {
