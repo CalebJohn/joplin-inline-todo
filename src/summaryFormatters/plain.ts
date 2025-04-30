@@ -1,4 +1,5 @@
 import { Settings, Todo, Summary } from '../types';
+import { createEvents } from 'ics';
 
 export function formatTodo(todo: Todo, _settings: Settings): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
@@ -13,6 +14,27 @@ export function formatTodo(todo: Todo, _settings: Settings): string {
 function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
+
+function todosToEvent(todo: Todo) {
+	// For now only all day events are supported
+	let date = todo.date.replace(/-/g, '');
+  return {
+		calName: "Joplin Todos",
+		productId: "-//plugin.calebjohn.todo//Inline Todo for Joplin//EN",
+		title: todo.msg,
+		url: "joplin://x-callback-url/openNote?id=" + todo.note,
+		// created: todo.created_time,
+		start: date,
+		end: date,
+		// duration: { minutes: 30 },
+		// alarms: [{
+		// 	action: 'display',
+		// 	description: todo.msg,
+		// 	trigger: todo.todo_due,
+		// }],
+	};
+}
+
 
 export async function plainBody(summary_map: Summary, settings: Settings) {
 	let summaryBody = '';
@@ -76,6 +98,24 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 		summaryBody += '\n';
 		
 		delete summary["COMPLETED"];
+	}
+
+	if (due.length > 0) {
+		summaryBody += '```ical\n';
+
+		const events = due.map((d) => todosToEvent(d));
+		const { error, value } = createEvents(events);
+
+		if (error) {
+			console.error(error);
+			summaryBody += "Error generating ical, please check logs for details";
+		} else {
+			summaryBody += value;
+		}
+
+
+		summaryBody += '```';
+		delete summary["DUE"];
 	}
 	
 

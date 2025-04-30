@@ -1,5 +1,5 @@
 import joplin from 'api';
-import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType} from 'api/types';
+import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType, SettingStorage} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Settings } from './types';
 import { update_summary } from './summary';
@@ -16,7 +16,7 @@ async function getSettings(): Promise<Settings> {
 		summary_type: await joplin.settings.value('summaryType'),
 		force_sync: await joplin.settings.value('forceSync'),
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
-		
+		add_ical_block: await joplin.settings.value('addiCalBlock'),
 	};
 }
 
@@ -90,6 +90,15 @@ joplin.plugins.register({
 				public: true,
 				advanced: true,
 				label: 'Include complete TODO items in TODO summary (it might take long time/long list)',
+			},
+			'addiCalBlock': {
+				value: false,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				// storage: SettingStorage.File,
+				public: true,
+				advanced: true,
+				label: 'Add iCal block',
 			},
 		});
 
