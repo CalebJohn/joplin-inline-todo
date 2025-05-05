@@ -100,7 +100,7 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 		delete summary["COMPLETED"];
 	}
 
-	if (due.length > 0) {
+	if (due.length > 0 && settings.add_ical_block) {
 		summaryBody += '```ical\n';
 
 		const events = due.map((d) => todosToEvent(d));
