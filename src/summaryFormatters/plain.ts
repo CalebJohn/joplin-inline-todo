@@ -124,7 +124,7 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 		delete summary["COMPLETED"];
 	}
 
-	if (due.length > 0 && settings.add_ical_block) {
+	if (settings.add_ical_block) {
 		summaryBody += '```ical\n';
 
 		const events = due.map((d) => todosToEvent(d, settings));
@@ -134,7 +134,13 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 			console.error(error);
 			summaryBody += "Error generating ical, please check logs for details";
 		} else {
-			summaryBody += value;
+			// TODO: Consider adding a ttl setting
+			const ttl = "1H"
+			// refresh-interval is the better field to use to specify how often a client can refresh
+			// apparently the rfc was put forward by apple, and is respected by their calendars
+			// https://www.rfc-editor.org/rfc/rfc7986#section-5.7
+			// https://stackoverflow.com/a/14162451
+			summaryBody += value.replace("X-PUBLISHED-TTL:PT1H", `X-PUBLISHED-TTL:PT${ttl}\nREFRESH-INTERVAL;VALUE=DURATION:PT${ttl}`);
 		}
 
 
