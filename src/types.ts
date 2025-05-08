@@ -45,8 +45,9 @@ export interface Settings {
 	summary_type: string;
 	force_sync: boolean;
 	show_complete_todo: boolean;
-	add_ical_block: boolean;
 	auto_refresh_summary: boolean;
+	add_ical_block: boolean;
+	shift_overdue: boolean;
 }
 
 export interface TitleEntry {

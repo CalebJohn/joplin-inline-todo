@@ -15,17 +15,41 @@ function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
 
-function todosToEvent(todo: Todo) {
+function formatDate(date: Date): string {
+	// Dates without timezones are parsed as UTC, so we need to treat them as UTC here
+	const year = date.getUTCFullYear();
+	// getMonth() is zero-based, so add 1
+	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+	const day = String(date.getUTCDate()).padStart(2, '0');
+
+	return `${year}${month}${day}`;
+}
+
+function todosToEvent(todo: Todo, settings: Settings) {
 	// For now only all day events are supported
-	let date = todo.date.replace(/-/g, '');
+	let date = new Date();
+	try {
+		date = new Date(todo.date);
+
+		if (settings.shift_overdue) {
+			const today = new Date();
+
+			if (date < today) {
+				date = today;
+			}
+		}
+	} catch (error) {
+		console.warn(`${todo.date} is not a date that new Date can understand, falling back to today`);
+		console.error(error);
+	}
   return {
 		calName: "Joplin Todos",
 		productId: "-//plugin.calebjohn.todo//Inline Todo for Joplin//EN",
 		title: todo.msg,
 		url: "joplin://x-callback-url/openNote?id=" + todo.note,
 		// created: todo.created_time,
-		start: date,
-		end: date,
+		start: formatDate(date),
+		end: formatDate(date),
 		// duration: { minutes: 30 },
 		// alarms: [{
 		// 	action: 'display',
@@ -103,7 +127,7 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 	if (due.length > 0 && settings.add_ical_block) {
 		summaryBody += '```ical\n';
 
-		const events = due.map((d) => todosToEvent(d));
+		const events = due.map((d) => todosToEvent(d, settings));
 		const { error, value } = createEvents(events);
 
 		if (error) {

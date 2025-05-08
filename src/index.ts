@@ -16,8 +16,9 @@ async function getSettings(): Promise<Settings> {
 		summary_type: await joplin.settings.value('summaryType'),
 		force_sync: await joplin.settings.value('forceSync'),
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
-		add_ical_block: await joplin.settings.value('addiCalBlock'),
 		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
+		add_ical_block: await joplin.settings.value('addiCalBlock'),
+		shift_overdue: await joplin.settings.value('shiftOverdue'),
 	};
 }
 
@@ -92,6 +93,14 @@ joplin.plugins.register({
 				advanced: true,
 				label: 'Include complete TODO items in TODO summary (it might take long time/long list)',
 			},
+			'autoRefreshSummary': {
+				value: true,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				advanced: true,
+				label: 'Refresh Summary note when opening the note.',
+			},
 			'addiCalBlock': {
 				value: false,
 				type: SettingItemType.Bool,
@@ -101,13 +110,13 @@ joplin.plugins.register({
 				advanced: true,
 				label: 'Add iCal block',
 			},
-			'autoRefreshSummary': {
+			'shiftOverdue': {
 				value: true,
 				type: SettingItemType.Bool,
 				section: 'settings.calebjohn.todo',
 				public: true,
 				advanced: true,
-				label: 'Refresh Summary note when opening the note.',
+				label: 'Shift overdue items to today in iCal block',
 			},
 		});
 
