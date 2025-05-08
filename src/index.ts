@@ -193,7 +193,8 @@ joplin.plugins.register({
 			}
 		});
 
-		if (!builder.settings.auto_refresh_summary) {
+		const platform = (await joplin.versionInfo()).platform;
+		if (!builder.settings.auto_refresh_summary || platform == "mobile") {
 			await joplin.views.toolbarButtons.create(
 				"refreshSummaryToolbarButton",
 				"inlineTodo.refreshSummary",
