@@ -58,10 +58,6 @@ export class SummaryBuilder {
 		let r;
 		do {
 			page += 1;
-			// I don't know how the basic search is implemented, it could be that it runs a regex
-			// query on each note under the hood. If that is the case and this behaviour crushed
-			// some slow clients, I should consider reverting this back to searching all notes
-			// (with the rate limiter)
 			r = await joplin.data.get(['search'], { query: query,  fields: ['id', 'body', 'title', 'parent_id', 'is_conflict'], page: page })
 					.catch((error) => {
 						console.error(error);
@@ -79,8 +75,6 @@ export class SummaryBuilder {
 				await new Promise(res => setTimeout(res, this._settings.scan_period_s * 1000));
 			}
 		} while(r.has_more);
-
-
 	}
 
 	// This function scans all notes, but it's rate limited to it from crushing Joplin

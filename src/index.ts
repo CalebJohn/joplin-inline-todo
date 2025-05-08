@@ -1,5 +1,5 @@
 import joplin from 'api';
-import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType, SettingStorage} from 'api/types';
+import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType, SettingStorage, ToolbarButtonLocation} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Settings } from './types';
 import { update_summary } from './summary';
@@ -17,6 +17,7 @@ async function getSettings(): Promise<Settings> {
 		force_sync: await joplin.settings.value('forceSync'),
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
 		add_ical_block: await joplin.settings.value('addiCalBlock'),
+		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
 	};
 }
 
@@ -100,6 +101,14 @@ joplin.plugins.register({
 				advanced: true,
 				label: 'Add iCal block',
 			},
+			'autoRefreshSummary': {
+				value: true,
+				type: SettingItemType.Bool,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				advanced: true,
+				label: 'Refresh Summary note when opening the note.',
+			},
 		});
 
 		const builder = new SummaryBuilder(await getSettings());
@@ -156,6 +165,42 @@ joplin.plugins.register({
 			{ accelerator: 'Ctrl+Alt+D' }
 		);
 
+		await joplin.commands.register({
+			name: "inlineTodo.refreshSummary",
+			label: "Refresh Summary Note",
+			iconName: "fas fa-sync-alt",
+			execute: async () => {
+				await builder.search_in_all();
+				let query = '/"<!-- inline-todo-plugin"';
+				let page = 0;
+				let r;
+				do {
+					page += 1;
+					r = await joplin.data.get(['search'], { query: query,  fields: ['id', 'body','is_conflict'], page: page })
+							.catch((error) => {
+								console.error(error);
+								console.warn("Joplin api error while searching for: " + query + " at page: " + page);
+								return { items: [], has_more: false };
+							});
+					if (r.items) {
+						for (let note of r.items) {
+							if (!note.is_conflict) {
+								update_summary(builder.summary, builder.settings, note.id, note.body);
+							}
+						}
+					}
+				} while(r.has_more);
+			}
+		});
+
+		if (!builder.settings.auto_refresh_summary) {
+			await joplin.views.toolbarButtons.create(
+				"refreshSummaryToolbarButton",
+				"inlineTodo.refreshSummary",
+				ToolbarButtonLocation.EditorToolbar
+			);
+		}
+
 		await joplin.settings.onChange(async (_) => {
 			builder.settings = await getSettings();
 		});
@@ -163,7 +208,7 @@ joplin.plugins.register({
 		await joplin.workspace.onNoteSelectionChange(async () => {
 			const currentNote = await joplin.workspace.selectedNote();
 
-			if (isSummary(currentNote)) {
+			if (builder.settings.auto_refresh_summary && isSummary(currentNote)) {
 				await builder.search_in_all();
 				update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
 			}

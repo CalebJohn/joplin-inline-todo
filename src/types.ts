@@ -46,6 +46,7 @@ export interface Settings {
 	force_sync: boolean;
 	show_complete_todo: boolean;
 	add_ical_block: boolean;
+	auto_refresh_summary: boolean;
 }
 
 export interface TitleEntry {
