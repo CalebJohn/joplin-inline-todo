@@ -40,31 +40,37 @@ export const regexes = {
 	list: {
 		title: 'Confluence Style',
 		// change to find completed todo
-		regex: /^\s*- \[[ |x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$/gm,
+		regex: /(^\s*- \[[ |x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n\s+.+$)*)/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => {
-			const result = todo[0].match(/(?<=\s@)([^\s]+)/);
+			const result = todo[1].match(/(?<=\s@)([^\s]+)/);
 			return result ? result[0] : '';
 		},
 		date: (todo: string[]) => {
-			const result = todo[0].match(/(?<=\s\/\/)([^\s]+)/);
+			const result = todo[1].match(/(?<=\s\/\/)([^\s]+)/);
 			return result ? result[0] : '';
 		},
 		tags: (todo: string[]) => {
 			// the /g is important to get multiple results instead of a single match
-			const result = todo[0].match(/(?<=\s\+)[^\s]+/g);
+			const result = todo[1].match(/(?<=\s\+)[^\s]+/g);
 			return result ? result : [];
 		},
 		msg: (todo: string[]) => {
-			let result = todo[0].split(/\s@[^\s]+/).join('');
+			let result = todo[1].split(/\s@[^\s]+/).join('');
 			result = result.split(/\s\/\/[^\s]+/).join('');
 			result = result.split(/\s\+[^\s]+/).join('');
 			result = result.split(/- \[[ |x]\]/).join('');
 			return result.trim();
 		},
+		description: (todo: string[]) => {
+			return todo.length > 5 ? todo[5] : '';
+		},
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
-		completed_regex: /^\s*- \[x\]\s.*$/,
+		completed: (todo: string[]) => {
+			const regex = /^\s*- \[x\]\s.*$/;
+			return regex.test(todo[1]);
+		},
 	},
 	link: {
 		title: 'Link Style',
@@ -74,13 +80,17 @@ export const regexes = {
 		date: (todo: string[]) => { return todo[2]; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
+		description: (todo: string[]) => { return '' },
 		toggle: { open: '[TODO]', closed: '[DONE]' },
 		completed_query: '/"[DONE]"',
-		completed_regex: /\[DONE\]\(.*?\)([^\n]+)$/,
+		completed: (todo: string[]) => {
+			const regex = /\[DONE\]\(.*?\)([^\n]+)$/;
+			return regex.test(todo[0]);
+		},
 	},
 	plain: {
 		title: 'List Style',
-		regex: /^\s*- \[[ |x]\] ()()([^\n]*)$/gm,
+		regex: /(^\s*- \[[ |x]\] ()()([^\n]*)$)((?:\n\s+.+$)*)/gm,
 		query: '/"- [ ]"',
 		assignee: (todo: string[]) => {
 			const result = regexes.list.assignee(todo);
@@ -95,9 +105,15 @@ export const regexes = {
 		msg: (todo: string[]) => {
 			return regexes.list.msg(todo);
 		},
+		description: (todo: string[]) => {
+			return todo.length > 5 ? todo[5] : '';
+		},
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
-		completed_regex: /^\s*- \[x\]\s.*$/,
+		completed: (todo: string[]) => {
+			const regex = /^\s*- \[x\]\s.*$/;
+			return regex.test(todo[1]);
+		},
 	},
 }
 

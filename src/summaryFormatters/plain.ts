@@ -1,5 +1,4 @@
 import { Settings, Todo, Summary } from '../types';
-import { createEvents } from 'ics';
 
 export function formatTodo(todo: Todo, _settings: Settings): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
@@ -14,51 +13,6 @@ export function formatTodo(todo: Todo, _settings: Settings): string {
 function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
-
-function formatDate(date: Date): string {
-	// Dates without timezones are parsed as UTC, so we need to treat them as UTC here
-	const year = date.getUTCFullYear();
-	// getMonth() is zero-based, so add 1
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const day = String(date.getUTCDate()).padStart(2, '0');
-
-	return `${year}${month}${day}`;
-}
-
-function todosToEvent(todo: Todo, settings: Settings) {
-	// For now only all day events are supported
-	let date = new Date();
-	try {
-		date = new Date(todo.date);
-
-		if (settings.shift_overdue) {
-			const today = new Date();
-
-			if (date < today) {
-				date = today;
-			}
-		}
-	} catch (error) {
-		console.warn(`${todo.date} is not a date that new Date can understand, falling back to today`);
-		console.error(error);
-	}
-  return {
-		calName: "Joplin Todos",
-		productId: "-//plugin.calebjohn.todo//Inline Todo for Joplin//EN",
-		title: todo.msg,
-		url: "joplin://x-callback-url/openNote?id=" + todo.note,
-		// created: todo.created_time,
-		start: formatDate(date),
-		end: formatDate(date),
-		// duration: { minutes: 30 },
-		// alarms: [{
-		// 	action: 'display',
-		// 	description: todo.msg,
-		// 	trigger: todo.todo_due,
-		// }],
-	};
-}
-
 
 export async function plainBody(summary_map: Summary, settings: Settings) {
 	let summaryBody = '';
@@ -123,31 +77,6 @@ export async function plainBody(summary_map: Summary, settings: Settings) {
 		
 		delete summary["COMPLETED"];
 	}
-
-	if (settings.add_ical_block) {
-		summaryBody += '```ical\n';
-
-		const events = due.map((d) => todosToEvent(d, settings));
-		const { error, value } = createEvents(events);
-
-		if (error) {
-			console.error(error);
-			summaryBody += "Error generating ical, please check logs for details";
-		} else {
-			// TODO: Consider adding a ttl setting
-			const ttl = "1H"
-			// refresh-interval is the better field to use to specify how often a client can refresh
-			// apparently the rfc was put forward by apple, and is respected by their calendars
-			// https://www.rfc-editor.org/rfc/rfc7986#section-5.7
-			// https://stackoverflow.com/a/14162451
-			summaryBody += value.replace("X-PUBLISHED-TTL:PT1H", `X-PUBLISHED-TTL:PT${ttl}\nREFRESH-INTERVAL;VALUE=DURATION:PT${ttl}`);
-		}
-
-
-		summaryBody += '```';
-		delete summary["DUE"];
-	}
-	
 
 	if (!summaryBody) {
 		summaryBody = '# All done!\n\n';

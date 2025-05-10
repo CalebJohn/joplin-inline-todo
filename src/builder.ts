@@ -37,7 +37,8 @@ export class SummaryBuilder {
 				assignee: todo_type.assignee(match),
 				date: todo_type.date(match),
 				tags: todo_type.tags(match),
-				completed: todo_type.completed_regex.test(match)
+				completed: todo_type.completed(match),
+				description: todo_type.description(match)
 			});
 		}
 

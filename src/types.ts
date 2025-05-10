@@ -17,6 +17,7 @@ export interface Todo {
 	date: string;
 	tags: string[];
 	completed: boolean;
+	description: string;
 }
 
 interface Toggle {
@@ -32,9 +33,10 @@ interface RegexEntry {
 	assignee: (s: string[]) => string;
 	date: (s: string[]) => string;
 	tags: (s: string[]) => string[];
+	description: (s: string[]) => string;
+	completed: (s: string[]) => boolean;
 	toggle: Toggle;
 	completed_query: string;
-	completed_regex: RegExp;
 }
 
 export interface Settings {
