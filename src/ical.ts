@@ -44,21 +44,17 @@ function cleanDescription(description: string): string {
   return processedLines.join('\n');
 }
 
-function formatDate(date: Date): string {
-	// Dates without timezones are parsed as UTC, so we need to treat them as UTC here
-	const year = date.getUTCFullYear();
-	// getMonth() is zero-based, so add 1
-	const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-	const day = String(date.getUTCDate()).padStart(2, '0');
-
-	return `${year}${month}${day}`;
-}
-
-function todosToEvent(todo: Todo, settings: Settings) {
+function parseDate(todo_date: string, settings: Settings): Date {
 	// For now only all day events are supported
 	let date = new Date();
 	try {
-		date = new Date(todo.date);
+		date = new Date(todo_date);
+		// Convert date into local time, this works because... javascript
+		date = new Date(
+			date.getUTCFullYear(),
+			date.getUTCMonth(),
+			date.getUTCDate()
+		);
 
 		if (settings.shift_overdue) {
 			const today = new Date();
@@ -68,9 +64,25 @@ function todosToEvent(todo: Todo, settings: Settings) {
 			}
 		}
 	} catch (error) {
-		console.warn(`${todo.date} is not a date that new Date can understand, falling back to today`);
+		console.warn(`${todo_date} is not a date that new Date can understand, falling back to today`);
 		console.error(error);
 	}
+	return date;
+}
+
+function formatDate(date: Date): string {
+	// Dates without timezones are parsed as UTC, so we need to treat them as UTC here
+	const year = date.getFullYear();
+	// getMonth() is zero-based, so add 1
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+
+	return `${year}${month}${day}`;
+}
+
+function todosToEvent(todo: Todo, settings: Settings) {
+	const date = parseDate(todo.date, settings);
+
   return {
 		calName: "Joplin Todos",
 		productId: "-//plugin.calebjohn.todo//Inline Todo for Joplin//EN",
