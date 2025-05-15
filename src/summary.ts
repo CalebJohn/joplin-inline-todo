@@ -19,8 +19,29 @@ export async function update_summary(summary_map: Summary, settings: Settings, s
 	await setSummaryBody(summaryBody, summary_id, old_body, settings);
 }
 
+function printDifferentLines(string1: string, string2: string): void {
+  const lines1 = string1.split('\n');
+  const lines2 = string2.split('\n');
+  
+  const maxLength = Math.max(lines1.length, lines2.length);
+  
+  for (let i = 0; i < maxLength; i++) {
+    const line1 = i < lines1.length ? lines1[i] : '[missing]';
+    const line2 = i < lines2.length ? lines2[i] : '[missing]';
+    
+    if (line1 !== line2) {
+      console.log(`Line ${i + 1} differs:`);
+      console.log(`< ${line1}`);
+      console.log(`> ${line2}`);
+      console.log('---');
+    }
+  }
+}
+
 async function setSummaryBody(summaryBody: string, summary_id: string, old_body: string, settings: Settings) {
 	const body = insertNewSummary(old_body, summaryBody);
+
+	printDifferentLines(old_body, summaryBody);
 
 	// Only update the note if it actually changed...
 	if (old_body === body) { return; }

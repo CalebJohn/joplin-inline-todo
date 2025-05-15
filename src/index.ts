@@ -130,6 +130,22 @@ joplin.plugins.register({
 			},
 		});
 
+		// TODO: This will need to be done with a contentScript
+		// await joplin.commands.register({
+		// 	name: "inlineTodo.editTodo",
+		// 	label: "Insert todo and parameters",
+		// 	iconName: "fas fa-sync-alt",
+		// 	execute: async () => {
+		// 		const line = await joplin.commands.execute('selectedText');
+		// 		console.warn(line);
+		// 	},
+		// });
+		// await joplin.views.toolbarButtons.create(
+		// 	"editTodoToolbarButton",
+		// 	"inlineTodo.editTodo",
+		// 	ToolbarButtonLocation.EditorToolbar
+		// );
+
 		await joplin.views.menuItems.create(
 			"createSummaryNoteMenuTools",
 			"inlineTodo.createSummaryNote",
