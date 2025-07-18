@@ -1,4 +1,3 @@
-
 export interface Note {
 	id: string;
 	body: string;
@@ -58,4 +57,3 @@ export interface TitleEntry {
 
 // Record<string, Todo[]>;
 export type Summary = Record<string, Todo[]>;
-

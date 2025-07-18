@@ -24,7 +24,7 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 
 	// Only update the note if it actually changed...
 	if (old_body === body) { return; }
-	
+
 	// if (settings.add_ical_block) {
 	// 	// UIDs in the ical block change with each generation, so need to compare without them
 	// 	// TODO: When I make the UIDs stable, this can be removed
@@ -34,7 +34,11 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 	// https://github.com/laurent22/joplin/issues/5955
 	const currentNote = await joplin.workspace.selectedNote();
 	if (currentNote.id == summary_id) {
-		await joplin.commands.execute('editor.setText', body);
+		try {
+			await joplin.commands.execute('editor.setText', body);
+		} catch (error) {
+			console.warn("Could not update summary note with editor.setText: " + summary_id);
+		}
 	}
 
 	await joplin.data.put(['notes', summary_id], null, { body: body })
@@ -47,4 +51,3 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 		await joplin.commands.execute('synchronize');
 	}
 }
-
