@@ -9,8 +9,33 @@ export function formatTodo(todo: Todo, settings: Settings): string {
 }
 
 // Create a string by concating some Note fields, this will determine sort order
-function sortString(todo: Todo): string {
+function sortString(todo: Todo, settings: Settings): string {
+	if (settings.sort_by === 'date') {
+		const sortableDate = formatDateForSorting(todo.date) || '9999-12-31';
+		return sortableDate + todo.assignee + todo.parent_title + todo.note_title + todo.msg + todo.note;
+	}
 	return todo.assignee + todo.parent_title + todo.note_title + todo.msg + todo.note;
+}
+
+// Convert date to sortable format (YYYY-MM-DD), handling various input formats
+function formatDateForSorting(dateStr: string): string | null {
+	if (!dateStr || dateStr.trim() === '') {
+		return null;
+	}
+	
+	try {
+		const date = new Date(dateStr);
+		if (isNaN(date.getTime())) {
+			return null;
+		}
+		
+		// Format as YYYY-MM-DD for proper string sorting
+		return date.getFullYear() + '-' + 
+			String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+			String(date.getDate()).padStart(2, '0');
+	} catch {
+		return null;
+	}
 }
 
 export async function tableBody(summary_map: Summary, settings: Settings) {
@@ -29,7 +54,7 @@ export async function tableBody(summary_map: Summary, settings: Settings) {
 		todos = todos.concat(tds)
 	}
 
-	todos = todos.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
+	todos = todos.sort((a, b) => sortString(a, settings).localeCompare(sortString(b, settings), undefined, { sensitivity: 'accent', numeric: true }));
 	for (let todo of todos) {
 		if (todo.completed) {
 			completed.push(todo)
