@@ -1,6 +1,6 @@
 {
   "name": "joplin-plugin-inline-todo",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "scripts": {
     "dist": "webpack --env joplin-plugin-config=buildMain && webpack --env joplin-plugin-config=buildExtraScripts && webpack --env joplin-plugin-config=createArchive",
     "prepare": "npm run dist",
