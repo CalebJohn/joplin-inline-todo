@@ -14,6 +14,7 @@ async function getSettings(): Promise<Settings> {
 		scan_period_c: await joplin.settings.value('scanPeriodRequestCount'),
 		todo_type: regexes[await joplin.settings.value('regexType')],
 		summary_type: await joplin.settings.value('summaryType'),
+		sort_by: await joplin.settings.value('sortBy'),
 		force_sync: await joplin.settings.value('forceSync'),
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
 		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
@@ -46,6 +47,18 @@ joplin.plugins.register({
 				section: 'settings.calebjohn.todo',
 				public: true,
 				label: 'Choose a Summary Note Format. Check the project page for examples',
+			},
+			'sortBy': {
+				value: 'assignee',
+				type: SettingItemType.String,
+				isEnum: true,
+				options: {
+					'assignee': 'Assignee (Default)',
+					'date': 'Due Date'
+				},
+				section: 'settings.calebjohn.todo',
+				public: true,
+				label: 'Sort table display TODOs by',
 			},
 			'scanPeriod': {
 				value: 11,

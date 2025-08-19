@@ -44,6 +44,7 @@ export interface Settings {
 	scan_period_c: number;
 	todo_type: RegexEntry;
 	summary_type: string;
+	sort_by: string;
 	force_sync: boolean;
 	show_complete_todo: boolean;
 	auto_refresh_summary: boolean;
