@@ -30,9 +30,6 @@
     "webpack-cli": "^4.10.0",
     "yargs": "^16.2.0"
   },
-  "dependencies": {
-    "ics": "^3.8.1"
-  },
   "files": [
     "publish"
   ]
