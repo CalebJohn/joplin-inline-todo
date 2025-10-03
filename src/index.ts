@@ -1,4 +1,5 @@
 import joplin from 'api';
+import Logger, { TargetType } from '@joplin/utils/Logger';
 import {ContentScriptType, MenuItem, MenuItemLocation, SettingItemType, SettingStorage, ToolbarButtonLocation} from 'api/types';
 import { SummaryBuilder } from './builder';
 import { Settings } from './types';
@@ -6,6 +7,13 @@ import { update_summary } from './summary';
 import { mark_current_line_as_done } from './mark_todo';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 import { createSummaryNote, isSummary } from './summary_note';
+import { registerEditor } from './editor';
+
+const globalLogger = new Logger();
+globalLogger.addTarget(TargetType.Console);
+Logger.initializeGlobalLogger(globalLogger);
+
+const logger = Logger.create('inline-todo: Index');
 
 
 async function getSettings(): Promise<Settings> {
@@ -18,8 +26,7 @@ async function getSettings(): Promise<Settings> {
 		force_sync: await joplin.settings.value('forceSync'),
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
 		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
-		add_ical_block: await joplin.settings.value('addiCalBlock'),
-		shift_overdue: await joplin.settings.value('shiftOverdue'),
+		custom_editor: await joplin.settings.value('enableCustomEditor'),
 	};
 }
 
@@ -114,22 +121,13 @@ joplin.plugins.register({
 				advanced: true,
 				label: 'Refresh Summary note when opening the note.',
 			},
-			'addiCalBlock': {
+			'enableCustomEditor': {
 				value: false,
 				type: SettingItemType.Bool,
 				section: 'settings.calebjohn.todo',
-				// storage: SettingStorage.File,
-				public: false,
+				public: true,
 				advanced: true,
-				label: 'Add iCal block',
-			},
-			'shiftOverdue': {
-				value: false,
-				type: SettingItemType.Bool,
-				section: 'settings.calebjohn.todo',
-				public: false,
-				advanced: true,
-				label: 'Shift overdue items to today in iCal block',
+				label: 'Enable custom editor for summary notes',
 			},
 		});
 
@@ -158,6 +156,8 @@ joplin.plugins.register({
 				mark_current_line_as_done(builder, currentNote);
 			},
 		});
+
+		const view = await registerEditor(builder);
 
 		joplin.workspace.filterEditorContextMenu(async (object: any) => {
 			const currentNote = await joplin.workspace.selectedNote();
@@ -200,8 +200,8 @@ joplin.plugins.register({
 					page += 1;
 					r = await joplin.data.get(['search'], { query: query,  fields: ['id', 'body','is_conflict'], page: page })
 							.catch((error) => {
-								console.error(error);
-								console.warn("Joplin api error while searching for: " + query + " at page: " + page);
+								logger.error(error);
+								logger.warn("Joplin api error while searching for: " + query + " at page: " + page);
 								return { items: [], has_more: false };
 							});
 					if (r.items) {

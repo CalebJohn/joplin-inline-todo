@@ -192,6 +192,7 @@ const pluginConfig = { ...baseConfig, entry: './src/index.ts',
 	resolve: {
 		alias: {
 			api: path.resolve(__dirname, 'api'),
+			'@/*': path.resolve(__dirname, './*'),
 		},
 		fallback: moduleFallback,
 		// JSON files can also be required from scripts so we include this.
@@ -252,6 +253,7 @@ const extraScriptConfig = {
 	resolve: {
 		alias: {
 			api: path.resolve(__dirname, 'api'),
+			'@/*': path.resolve(__dirname, './*'),
 		},
 		fallback: moduleFallback,
 		extensions: ['.js', '.tsx', '.ts', '.json'],

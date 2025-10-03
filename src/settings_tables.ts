@@ -36,6 +36,7 @@ export const summaries = {
 // The toggle is an object that containes the [un]completed state of a todo
 // The completed_query is what will identify a note with a completed todo (Joplin search syntax)
 // The completed_regex is what will identify a line as completed
+// The scrollToText will be used the the scrollToText command
 export const regexes = {
 	list: {
 		title: 'Confluence Style',
@@ -71,6 +72,11 @@ export const regexes = {
 			const regex = /^\s*- \[x\]\s.*$/;
 			return regex.test(todo[1]);
 		},
+		scrollToText: (todo: string[]) => ({
+			// Remove the leading '- ' it will be added by the scrollToText function
+			text: todo[1].slice(2),
+			element: 'ul'
+		}),
 	},
 	link: {
 		title: 'Link Style',
@@ -87,6 +93,7 @@ export const regexes = {
 			const regex = /\[DONE\]\(.*?\)([^\n]+)$/;
 			return regex.test(todo[0]);
 		},
+		scrollToText: (todo: string[]) => ({}),
 	},
 	plain: {
 		title: 'List Style',
@@ -114,6 +121,11 @@ export const regexes = {
 			const regex = /^\s*- \[x\]\s.*$/;
 			return regex.test(todo[1]);
 		},
+		scrollToText: (todo: string[]) => ({
+			// Remove the leading '- ' it will be added by the scrollToText function
+			text: todo[1].slice(2),
+			element: 'ul'
+		}),
 	},
 }
 

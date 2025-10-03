@@ -38,7 +38,8 @@ export class SummaryBuilder {
 				date: todo_type.date(match),
 				tags: todo_type.tags(match),
 				completed: todo_type.completed(match),
-				description: todo_type.description(match)
+				description: todo_type.description(match),
+				scrollTo: todo_type.scrollToText(match)
 			});
 		}
 

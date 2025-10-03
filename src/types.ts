@@ -17,6 +17,7 @@ export interface Todo {
 	tags: string[];
 	completed: boolean;
 	description: string;
+	scrollTo: object; // joplin ScrollToTextValue
 }
 
 interface Toggle {
@@ -36,6 +37,7 @@ interface RegexEntry {
 	completed: (s: string[]) => boolean;
 	toggle: Toggle;
 	completed_query: string;
+	scrollToText: (s: string[]) => object; // joplin ScrollToTextValue
 }
 
 export interface Settings {
@@ -48,8 +50,7 @@ export interface Settings {
 	force_sync: boolean;
 	show_complete_todo: boolean;
 	auto_refresh_summary: boolean;
-	add_ical_block: boolean;
-	shift_overdue: boolean;
+	custom_editor: boolean;
 }
 
 export interface TitleEntry {
@@ -58,3 +59,30 @@ export interface TitleEntry {
 
 // Record<string, Todo[]>;
 export type Summary = Record<string, Todo[]>;
+
+// IPC and webview types copied from 
+// https://github.com/joplin/plugin-yesyoukan/blob/master/src/utils/types.ts
+export type IpcMessageType =
+	'getSettings' |
+	'getSummary' |
+	'updateSummary' |
+	'markDone' |
+	'jumpTo' |
+	'shouldUseDarkColors';
+
+export interface IpcMessage {
+	type: IpcMessageType;
+	value?: any;
+}
+
+export interface OnMessageMessage {
+	message: IpcMessage;
+}
+
+type WebviewApiOnMessageHandler = (message:OnMessageMessage) => void;
+
+export interface WebviewApi {
+	postMessage<T>(message:IpcMessage): Promise<T>;
+	onMessage(handler:WebviewApiOnMessageHandler);
+	menuPopupFromTemplate(template:any[]);
+}

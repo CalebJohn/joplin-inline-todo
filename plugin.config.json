@@ -8,6 +8,8 @@
     "summary.ts",
 
     "todoRender/index.ts",
-    "todoRender/conferenceStyleRender.ts"
+    "todoRender/conferenceStyleRender.ts",
+
+    "panel.tsx"
   ]
 }
