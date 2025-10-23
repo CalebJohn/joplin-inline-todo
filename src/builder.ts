@@ -43,16 +43,9 @@ export class SummaryBuilder {
 			});
 		}
 
-		if (matches.length > 0 || this._summary[note.id]?.length > 0) {
-			// Check if the matches actually changed
-			const dirty = JSON.stringify(this._summary[note.id]) != JSON.stringify(matches);
-
+		if (matches.length > 0) {
 			this._summary[note.id] = matches;
-
-			return dirty;
 		}
-
-		return false;
 	}
 
 	async search_with_query(query: string) {
