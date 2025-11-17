@@ -122,14 +122,20 @@ joplin.plugins.register({
 				label: 'Refresh Summary note when opening the note.',
 			},
 			'enableCustomEditor': {
-				value: true,
+				value: false,
 				type: SettingItemType.Bool,
 				section: 'settings.calebjohn.todo',
 				public: true,
-				advanced: true,
 				label: 'Enable custom editor for summary notes',
 			},
 		});
+
+		// TODO: remove this and change default to false
+		// This line ensures that the setting has been set, allowing us to
+		// change the default for new users only
+		if (!(await joplin.settings.value('enableCustomEditor'))) {
+			await joplin.settings.setValue('enableCustomEditor', false);
+		}
 
 		const builder = new SummaryBuilder(await getSettings());
 		await registerEditor(builder);
