@@ -1,6 +1,6 @@
 // Maintainer: [psfinal9](https://github.com/psfinal9/)
 
-import { Settings, Todo, Summary } from '../types';
+import { Settings, Todo, SummaryMap } from '../types';
 
 export function formatTodo(todo: Todo, _settings: Settings): string {
 	const tags = todo.tags.map((s: string) => '+' + s).join(' ');
@@ -30,7 +30,7 @@ function sortString(todo: Todo): string {
 	return todo.note_title + todo.msg + todo.note;
 }
 
-export async function diaryBody(summary_map: Summary, settings: Settings) {
+export async function diaryBody(summary_map: SummaryMap, settings: Settings) {
 	let summaryBody = '';
 	let summary: Record<string, Record<string, Todo[]>> = {};
 	let due: Todo[] = [];
@@ -46,14 +46,14 @@ export async function diaryBody(summary_map: Summary, settings: Settings) {
 				if (todo.date) {
 					due.push(todo);
 				} else {
-					const assignee = todo.assignee.toUpperCase();
-					if (!(assignee in summary)) {
-						summary[assignee] = {};
+					const category = todo.category.toUpperCase();
+					if (!(category in summary)) {
+						summary[category] = {};
 					}
-					if (!(todo.parent_title in summary[assignee])) {
-						summary[assignee][todo.parent_title] = [];
+					if (!(todo.parent_title in summary[category])) {
+						summary[category][todo.parent_title] = [];
 					}
-					summary[assignee][todo.parent_title].push(todo);
+					summary[category][todo.parent_title].push(todo);
 				}
 			}
 		}
@@ -69,10 +69,10 @@ export async function diaryBody(summary_map: Summary, settings: Settings) {
 	}
 
 	const entries = Object.entries(summary).sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'accent', numeric: true }));
-	// The rest of the "assignees"
-	for (const [assignee, folders] of entries) {
-		if (assignee) {
-			summaryBody += `# ${assignee}\n`;
+	// The rest of the "categories"
+	for (const [category, folders] of entries) {
+		if (category) {
+			summaryBody += `# ${category}\n`;
 		}
 		const fentries = Object.entries(folders).sort((a, b) => a[0].localeCompare(b[0], undefined, { sensitivity: 'accent', numeric: true }));
 		for (const [folder, tds] of fentries) {

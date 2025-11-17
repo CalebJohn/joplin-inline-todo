@@ -9,7 +9,7 @@ import { diaryBody, formatTodo as diaryFormat } from './summaryFormatters/diary'
 // The title is what will appear in the settings menu
 export const summaries = {
 	plain: {
-		title: 'Assignee/Notebook List',
+		title: 'Category/Notebook List',
 		func: plainBody,
 		format: plainFormat,
 	},
@@ -29,7 +29,7 @@ export const summaries = {
 // The title is what will appear in the settings menu
 // The regex is what will identify a todo line
 // The query is what will identify a note with a todo in it (Joplin search syntax)
-// The assignee is a function that extracts the assignee from the todo
+// The category is a function that extracts the category from the todo
 // The date is a function that extracts the date from the todo
 // The tags is a function that extracts the tags from the todo
 // The msg is a function that extracts the message from the todo
@@ -39,11 +39,11 @@ export const summaries = {
 // The scrollToText will be used the the scrollToText command
 export const regexes = {
 	list: {
-		title: 'Confluence Style',
+		title: 'Metalist Style',
 		// change to find completed todo
 		regex: /(^\s*- \[[ |x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
 		query: '/"- [ ]"',
-		assignee: (todo: string[]) => {
+		category: (todo: string[]) => {
 			const result = todo[1].match(/(?<=\s@)([^\s]+)/);
 			return result ? result[0] : '';
 		},
@@ -73,8 +73,8 @@ export const regexes = {
 			return regex.test(todo[1]);
 		},
 		scrollToText: (todo: string[]) => ({
-			// Remove the leading '- ' it will be added by the scrollToText function
-			text: todo[1].slice(2),
+			// Remove the leading whitespace and the '- ' it will be added by the scrollToText function
+			text: todo[1].trim().slice(2),
 			element: 'ul'
 		}),
 	},
@@ -82,7 +82,7 @@ export const regexes = {
 		title: 'Link Style',
 		regex: /\[((?:TODO)|(?:DONE))\]\((.*?)\)([^\n]+)$/gmi,
 		query: '/"[TODO]"',
-		assignee: (todo: string[]) => { return todo[1]; },
+		category: (todo: string[]) => { return todo[1]; },
 		date: (todo: string[]) => { return todo[2]; },
 		tags: (todo: string[]) => { return []; },
 		msg: (todo: string[]) => { return todo[3]; },
@@ -99,8 +99,8 @@ export const regexes = {
 		title: 'List Style',
 		regex: /(^\s*- \[[ |x]\] ()()([^\n]*)$)((?:\n[^\S\n]+.+$)*)/gm,
 		query: '/"- [ ]"',
-		assignee: (todo: string[]) => {
-			const result = regexes.list.assignee(todo);
+		category: (todo: string[]) => {
+			const result = regexes.list.category(todo);
 			return result || 'Unassigned';
 		},
 		date: (todo: string[]) => {

@@ -53,7 +53,7 @@ export function conferenceStyleRender(markdownIt, _options) {
                     switch (result[keywordBegin]) {
                         case '@':
                             if (keywords.length > 1) {
-                                modifiedResult += `<span class="inline-todo inline-todo-assignee">${keywords}</span>`;
+                                modifiedResult += `<span class="inline-todo inline-todo-category">${keywords}</span>`;
                             } else {
                                 modifiedResult += keywords;
                             }

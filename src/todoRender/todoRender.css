@@ -1,66 +1,65 @@
 span.inline-todo {
-    font-size: 90%;
-    padding: 2px 3px;
-    text-align: center;
+	font-size: 90%;
+	padding: 2px 3px;
+	text-align: center;
 }
 
 
-span.inline-todo-assignee {
-    background-color: dodgerblue;
-    color: white;
-    border-radius: 4px;
+span.inline-todo-category {
+	background-color: dodgerblue;
+	color: white;
+	border-radius: 4px;
 }
 
 span.inline-todo-date {
-    background-color: #52C41B;
-    color: white;
-    border-radius: 4px;
+	background-color: #52C41B;
+	color: white;
+	border-radius: 4px;
 }
 span.inline-todo-date.due {
-    background-color: orange;
+	background-color: orange;
 }
 span.inline-todo-date.overdue {
-    background-color: orangered;
+	background-color: orangered;
 }
 
 span.inline-todo-date::before {
-    content: '🕰 ';
+	content: '🕰 ';
 }
 
 .tag {
-    position: relative;
-    top: 0;
-    z-index: 1;
-    text-align: center;
-    color: white;
+	position: relative;
+	top: 0;
+	z-index: 1;
+	text-align: center;
+	color: white;
 }
 
 .tag::before,
 .tag::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    transform: skew(-12deg);
+	content: '';
+	position: absolute;
+	top: 0;
+	transform: skew(-12deg);
 }
 
 .tag::after {
-    right: 0;
-    bottom: 0;
-    z-index: -1;
-    border-radius: 5px;
-    background: red;
+	right: 0;
+	bottom: 0;
+	z-index: -1;
+	border-radius: 5px;
 }
 
 .tag-left::after {
-    left: 0;
+	left: 0;
 }
 
 .tag-left::before {
-    left: -10px;
+	left: -10px;
 }
 
 .tag-right::after {
-    background-color: #52C41B;
-    left: 0;
+	background-color: #52C41B;
+	left: 0;
 }
 

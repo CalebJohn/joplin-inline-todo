@@ -26,12 +26,12 @@ The basic function of this plugin is to have a single note where you can view al
  - Joplin -> Preferences (macOS))
 
 ## TODO Types
-### Confluence Style
+### Metalist Style
 Inspired by [this post](https://discourse.joplinapp.org/t/create-a-task-report-plugin-for-a-joplin-note-taking-app/21177) on the Joplin forum. This is the preferred style because it uses the markdown checkbox format (plus some special syntax), making it trivial to check the box and hide the TODO from the summary. 
 
-The basic form is a checkbox, followed any (or all) of: @assignee (this is a primary filtering field, so there can only be one), //date, +tags, and finally the TODO content. Having at least on of these special fields is required for the todo to be picked up by the plugin, without them it is just a plain checkbox.
+The basic form is a checkbox, followed any (or all) of: @category (this is a primary filtering field, so there can only be one), //date, +tags, and finally the TODO content. Having at least on of these special fields is required for the todo to be picked up by the plugin, without them it is just a plain checkbox.
 
-@assignee does not need to be a person, it can also be viewed as a category. It will sometimes affect the rendering of the content by grouping assignees. 
+@category does not need to be a person, it can also be viewed as a category. It will sometimes affect the rendering of the content by grouping categories. 
 ```
 I take a lot of notes about various things. It can be helpful to
 keep my TODOs together with the content they pertain to.
@@ -66,7 +66,7 @@ I'd still like a way to view all these! See below.
 ```
 
 ### List Style
-This style just uses markdown checklist items. What sets this apart from the Confluence style is the lack of support for categories and dates in this style. This style was created for users that are already happy using plain checklists for their tasks, but want an additional place to collect them. For most users, I recommend the Confluence style instead.
+This style just uses markdown checklist items. What sets this apart from the Metalist style is the lack of support for categories and dates in this style. This style was created for users that are already happy using plain checklists for their tasks, but want an additional place to collect them. For most users, I recommend the Metalist style instead.
 
 ```
 I take a lot of notes about various things. It can be helpful to
@@ -111,7 +111,7 @@ This style is meant for personal use, the table method (below) is recommended fo
 This is particularly powerful when combined with hieuthi's [table sorting plugin](https://discourse.joplinapp.org/t/plugin-markdown-table-sortable/21846). (warning: if you use the "apply sorting" feature, the sort will be overwritten when a new summary is written, don't rely on it!).
 
 ```
-| Task | Assignee | Due | Tags | Notebook | Note |
+| Task | Category | Due | Tags | Notebook | Note |
 | ---- | -------- | --- | ---- | -------- | ---- |
 | Have some me time | Linda | 2022-01-13 |  | Folder 3 | [Note a](:/e710b7af31fc47c89ca5fc4d3c0ecb3a)
 | Call Teddy | Bob |  | repairs | Folder 2 | [Note c](:/ef3aac56ffa246baa6a96cc94dd8f25e)
@@ -130,7 +130,7 @@ Todos can be filtered such that the plugin will only display Todos from specific
 # Roadmap
 I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.
 ### Ideas
-- [ ] Add in support for spaces in the assignee field of the confluence style. This will allow for assignees like @"Caleb John"
+- [ ] Add in support for spaces in the category field of the metalist style. This will allow for categories like @"Caleb John"
 - [ ] Add in the fuzzy date handling (e.g. mid april)
 - [ ] Add a renderer component that adds html ids (so we can scroll to TODOs)
 - [ ] Add support for the [Metis plugin](https://github.com/hieuthi/joplin-plugin-metis) (todo.txt)

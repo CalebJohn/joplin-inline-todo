@@ -3,6 +3,9 @@ import { Settings, Note, Todo, Summary } from './types';
 import { summaries } from './settings_tables';
 import { SummaryBuilder } from './builder';
 import { update_summary } from './summary';
+import Logger from "@joplin/utils/Logger";
+
+const logger = Logger.create('inline-todo: mark_todo');
 
 export async function mark_current_line_as_done(builder: SummaryBuilder, currentNote: Note) {
 	// try to find a corresponding TODO and set it as complete in its original note 
@@ -14,12 +17,12 @@ export async function mark_current_line_as_done(builder: SummaryBuilder, current
 		// origin was updated, so update the TODO summary
 		const origin = await joplin.data.get(['notes', todo.note], { fields: ['body', 'id', 'title', 'parent_id', 'is_conflict'] })
 				.catch((error) => {
-					console.error(error);
-					console.warn("Could not read note with api: " + todo.note);
+					logger.error(error);
+					logger.warn("Could not read note with api: " + todo.note);
 					return { };
 				});
 		if (!origin) {
-			console.error("Could not mark current line as done, see errors above");
+			logger.error("Could not mark current line as done, see errors above");
 			return;
 		}
 		await builder.search_in_note(origin);
@@ -39,29 +42,29 @@ async function get_current_line(): Promise<string> {
 }
 
 // Map the formated line back to it's origin
-function parse_summary_line(line: string, summary_map: Summary, settings: Settings): Todo {
+function parse_summary_line(line: string, summary: Summary, settings: Settings): Todo {
 	const formatTodo = summaries[settings.summary_type].format;
 
-	for (const [_, todos] of Object.entries(summary_map)) {
+	for (const [_, todos] of Object.entries(summary.map)) {
 		for (let todo of todos) {
 			if (line.trim() == formatTodo(todo, settings).trim()) {
 				return todo;
 			}
 		}
 	}
-	console.error(`Failed to find the corresponding todo for ${line}`);
+	logger.error(`Failed to find the corresponding todo for ${line}`);
 	return undefined;
 }
 
 async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean> {
 	const origin = await joplin.data.get(['notes', todo.note], { fields: ['body'] })
 			.catch((error) => {
-				console.error(error);
-				console.warn("Could not get note body from api: " + todo.note);
+				logger.error(error);
+				logger.warn("Could not get note body from api: " + todo.note);
 				return { };
 			});
 	if (!origin) {
-		console.error("Could not set the todo origin, see errors above");
+		logger.error("Could not set the todo origin, see errors above");
 		return;
 	}
 	let lines = origin.body.split('\n');
@@ -75,7 +78,7 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 
 		if (!((parser.msg(match) == todo.msg) &&
 			(parser.date(match) == todo.date) &&
-			(parser.assignee(match) == todo.assignee) &&
+			(parser.category(match) == todo.category) &&
 			(JSON.stringify(parser.tags(match)) == JSON.stringify(todo.tags)))) {
 				continue;
 			}
@@ -90,12 +93,45 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 		// edit origin note
 		await joplin.data.put(['notes', todo.note], null, { body: lines.join('\n') })
 				.catch((error) => {
-					console.error(error);
-					console.warn("Could not write to note: " + todo.note);
+					logger.error(error);
+					logger.warn("Could not write to note: " + todo.note);
 				});
 
 		return true;
 	}
 
 	return false
+}
+
+export async function mark_done_scrollto(todo: Todo): Promise<boolean> {
+	let originalBody: string;
+	try {
+		const original = await joplin.data.get(['notes', todo.note], { fields: ['body'] });
+		originalBody = original.body;
+	} catch (error) {
+		logger.error(error);
+		logger.warn("Could not get note body from api: " + todo.note);
+		return false;
+	}
+
+	const updateState = (t, s) => '[' + s + t.slice(2);
+	// the todo.completed field here is not true to the builder summary
+	// it comes from the TodoCard component, so it isn't guarenteed to be
+	// inline with that the scrollTo.text field says, so we'll need to manually create that
+	const oldState = todo.completed ? ' ' : 'x';;
+	const text = updateState(todo.scrollTo.text, oldState);
+	const newState = todo.completed ? 'x' : ' ';;
+	const newText = updateState(text, newState);
+
+	const newBody = originalBody.replace(text, newText);
+
+	try {
+		await joplin.data.put(['notes', todo.note], null, { body: newBody });
+	} catch (error) {
+		logger.error(error);
+		logger.warn("Could not write to note: " + todo.note + " todo not toggled " + todo.msg);
+		return false;
+	}
+
+	return true;
 }

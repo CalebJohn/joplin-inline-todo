@@ -1,3 +1,5 @@
+import { DateTime, Duration } from "luxon";
+
 export interface Note {
 	id: string;
 	body: string;
@@ -6,18 +8,27 @@ export interface Note {
 	is_conflict: boolean;
 }
 
+// ScrollToTextValue not exported by Joplin
+interface ScrollToTextValue {
+	text: string;
+	element: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'strong' | 'ul';
+	// I don't use scrollStrategy so leaving it out for simplicity
+	// scrollStrategy?: ScrollStrategy;
+}
+
 export interface Todo {
 	note: string;
 	note_title: string;
 	parent_id: string;
 	parent_title: string;
 	msg: string;
-	assignee: string;
+	category: string;
 	date: string;
 	tags: string[];
 	completed: boolean;
 	description: string;
-	scrollTo: object; // joplin ScrollToTextValue
+	scrollTo: ScrollToTextValue;
+	key?: string;
 }
 
 interface Toggle {
@@ -30,7 +41,7 @@ interface RegexEntry {
 	regex: RegExp;
 	query: string;
 	msg: (s: string[]) => string;
-	assignee: (s: string[]) => string;
+	category: (s: string[]) => string;
 	date: (s: string[]) => string;
 	tags: (s: string[]) => string[];
 	description: (s: string[]) => string;
@@ -57,12 +68,74 @@ export interface TitleEntry {
 	title: string;
 }
 
-// Record<string, Todo[]>;
-export type Summary = Record<string, Todo[]>;
+interface SummaryMeta {
+	lastRefresh: Date;
+}
+
+export type SummaryMap = Record<string, Todo[]>;
+
+export interface Summary {
+	meta: SummaryMeta;
+	map: SummaryMap;
+}
+
+export type DateFilter = string;
+export type CompletedFilter = string;
+
+export interface Filter {
+	filterName: string;
+	note: string[];
+	note_title: string[];
+	parent_id: string[];
+	parent_title: string[];
+	msg: string[]; // message contains
+	category: string[];
+	date: DateFilter;
+	dateOverride: DateFilter; // Should be replaced by generic overrides eventually
+	tags: string[];
+	completed: CompletedFilter;
+}
+
+// { key: date string }
+export type Checked = Record<string, string>;
+
+export interface Filters {
+	saved: Filter[];
+	active: Filter;
+	activeHistory: Filter[];
+	checked: Checked;
+}
+
+export interface ActiveFiltered {
+	openCount: number;
+	totalCount: number;
+	todos: Todo[];
+}
+
+export interface SavedItem {
+	filterName: string;
+	openCount: number;
+}
+
+export interface Filtered {
+	saved: SavedItem[];
+	active: ActiveFiltered;
+}
+
+export interface UniqueFields {
+	note: string[];
+	note_title: string[];
+	parent_id: string[];
+	parent_title: string[];
+	category: string[];
+	tags: string[];
+}
 
 // IPC and webview types copied from 
 // https://github.com/joplin/plugin-yesyoukan/blob/master/src/utils/types.ts
 export type IpcMessageType =
+	'getFilters' |
+	'setFilters' |
 	'getSettings' |
 	'getSummary' |
 	'updateSummary' |

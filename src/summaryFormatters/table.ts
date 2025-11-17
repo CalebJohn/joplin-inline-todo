@@ -1,7 +1,7 @@
-import { Settings, Todo, Summary } from '../types';
+import { Settings, Todo, SummaryMap } from '../types';
 
 export function formatTodo(todo: Todo, settings: Settings): string {
-	let todoString = `\n| ${todo.msg} | ${todo.assignee} | ${todo.date} | ${todo.tags.join(' ')} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note}) |`;
+	let todoString = `\n| ${todo.msg} | ${todo.category} | ${todo.date} | ${todo.tags.join(' ')} | ${todo.parent_title} | [${todo.note_title}](:/${todo.note}) |`;
 	if (settings.show_complete_todo) {
 		todoString += ` ${todo.completed ? 'Y' : ''} |`;
 	}
@@ -12,9 +12,9 @@ export function formatTodo(todo: Todo, settings: Settings): string {
 function sortString(todo: Todo, settings: Settings): string {
 	if (settings.sort_by === 'date') {
 		const sortableDate = formatDateForSorting(todo.date) || '9999-12-31';
-		return sortableDate + todo.assignee + todo.parent_title + todo.note_title + todo.msg + todo.note;
+		return sortableDate + todo.category + todo.parent_title + todo.note_title + todo.msg + todo.note;
 	}
-	return todo.assignee + todo.parent_title + todo.note_title + todo.msg + todo.note;
+	return todo.category + todo.parent_title + todo.note_title + todo.msg + todo.note;
 }
 
 // Convert date to sortable format (YYYY-MM-DD), handling various input formats
@@ -38,9 +38,9 @@ function formatDateForSorting(dateStr: string): string | null {
 	}
 }
 
-export async function tableBody(summary_map: Summary, settings: Settings) {
+export async function tableBody(summary_map: SummaryMap, settings: Settings) {
 	let completed: Todo[] = [];
-	let summaryBody = '| Task | Assignee | Due | Tags | Notebook | Note |';
+	let summaryBody = '| Task | category | Due | Tags | Notebook | Note |';
 	if (settings.show_complete_todo) {
 		summaryBody += ' Completed |';
 	}

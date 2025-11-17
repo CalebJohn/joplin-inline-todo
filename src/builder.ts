@@ -1,13 +1,14 @@
 import joplin from 'api';
-import { Note, Settings, Todo, Summary } from './types';
+import { Note, Settings, Todo, Summary, SummaryMap } from './types';
 
 export class SummaryBuilder {
-	_summary: Summary = {};
+	_summary: SummaryMap = {};
 	// Maps folder ids to folder name
 	// Record<id, name>
 	_folders: Record<string, string> = {};
 	// Don't overwrite the summary note unless all notes have been checked
 	_initialized: boolean = false;
+	_lastRefresh: Date = new Date();
 	// The plugin settings
 	_settings: Settings;
 
@@ -34,12 +35,12 @@ export class SummaryBuilder {
 				parent_id: note.parent_id,
 				parent_title: folder,
 				msg: todo_type.msg(match),
-				assignee: todo_type.assignee(match),
+				category: todo_type.category(match),
 				date: todo_type.date(match),
 				tags: todo_type.tags(match),
 				completed: todo_type.completed(match),
 				description: todo_type.description(match),
-				scrollTo: todo_type.scrollToText(match)
+				scrollTo: todo_type.scrollToText(match),
 			});
 		}
 
@@ -84,6 +85,7 @@ export class SummaryBuilder {
 			await this.search_with_query(this._settings.todo_type.completed_query);
 		}
 		this._initialized = true;
+		this._lastRefresh = new Date();
 	}
 
 	// Reads a parent title from cache, or uses the joplin api to get a title based on id
@@ -103,7 +105,7 @@ export class SummaryBuilder {
 	}
 
 	get summary(): Summary {
-		return this._summary;
+		return { meta: { lastRefresh: this._lastRefresh }, map: this._summary };
 	}
 
 	get settings(): Settings {

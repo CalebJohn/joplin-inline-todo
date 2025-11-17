@@ -56,11 +56,11 @@ joplin.plugins.register({
 				label: 'Choose a Summary Note Format. Check the project page for examples',
 			},
 			'sortBy': {
-				value: 'assignee',
+				value: 'category',
 				type: SettingItemType.String,
 				isEnum: true,
 				options: {
-					'assignee': 'Assignee (Default)',
+					'category': 'Category (Default)',
 					'date': 'Due Date'
 				},
 				section: 'settings.calebjohn.todo',
@@ -95,7 +95,7 @@ joplin.plugins.register({
 				section: 'settings.calebjohn.todo',
 				public: true,
 				advanced: true,
-				label: 'Apply styling to confluence style todos in the markdown renderer (Restart Required)',
+				label: 'Apply styling to metalist style todos in the markdown renderer (Restart Required)',
 			},
 			'forceSync': {
 				value: true,
@@ -122,7 +122,7 @@ joplin.plugins.register({
 				label: 'Refresh Summary note when opening the note.',
 			},
 			'enableCustomEditor': {
-				value: false,
+				value: true,
 				type: SettingItemType.Bool,
 				section: 'settings.calebjohn.todo',
 				public: true,
@@ -132,6 +132,7 @@ joplin.plugins.register({
 		});
 
 		const builder = new SummaryBuilder(await getSettings());
+		await registerEditor(builder);
 
 		await joplin.commands.register({
 			name: "inlineTodo.createSummaryNote",
@@ -156,8 +157,6 @@ joplin.plugins.register({
 				mark_current_line_as_done(builder, currentNote);
 			},
 		});
-
-		const view = await registerEditor(builder);
 
 		joplin.workspace.filterEditorContextMenu(async (object: any) => {
 			const currentNote = await joplin.workspace.selectedNote();

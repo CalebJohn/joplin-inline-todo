@@ -1,30 +1,63 @@
 import * as React from "react"
 import { useState } from 'react';
-import useSettings from './hooks/useSettings';
-import useSummary from './hooks/useSummary';
-import { Summary, Todo, WebviewApi } from "../types";
+import calcFiltered from "./lib/filters";
+import collectUnique from "./lib/collectUnique";
+import useFilters from './hooks/useFilters';
+import usePluginData from './hooks/usePluginData';
+import { Settings, Summary, Todo, WebviewApi } from "../types";
 import TodoCard from "./TodoCard"
+import FilterSidebar from "./Sidebar"
+import { RefreshButton } from "./RefreshButton";
 import { ScrollArea } from "@/src/gui/components/ui/scroll-area"
+import { Separator } from "@/src/gui/components/ui/separator"
+import { SidebarProvider, SidebarTrigger } from "@/src/gui/components/ui/sidebar"
+import Logger from "@joplin/utils/Logger";
+
+const logger = Logger.create('inline-todo: App');
 
 declare var webviewApi: WebviewApi;
 
-export default function Game() {
 
-	const settings = useSettings({ webviewApi });
-	const summary = useSummary({ webviewApi });
+export default function App() {
+	const {summary, settings, refreshSummary} = usePluginData({ webviewApi });
+
+	const [filters, dispatch] = useFilters({ webviewApi, summary });
+
+	const filtered = calcFiltered(summary, filters);
+	const uniqueFields = collectUnique(summary);
+
+	const sidebarProps = {
+		filters,
+		dispatch,
+		filtered,
+		uniqueFields,
+	};
 
 	return (
-		<div className="todo-editor w-full">
-			<ScrollArea className="todo-list w-full h-full">
-			{
-				summary.filter(t => !t.completed).map((todo) => {
-					return (
-						<TodoCard {...todo} />
-					);
-				})
-			}
-			</ScrollArea>
-		</div>
+		<SidebarProvider>
+			<FilterSidebar {...sidebarProps} />
+			<main className="todo-editor flex flex-col flex-1 min-w-0">
+				<header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
+					<SidebarTrigger className="-ml-1" />
+					<Separator
+						orientation="vertical"
+						className="mr-2 data-[orientation=vertical]:h-4"
+					/>
+					<div className="flex ml-auto px-3 items-center gap-2">
+						<RefreshButton {...{refreshSummary}} />
+					</div>
+				</header>
+				<div className="flex p-2 flex-col flex-1 overflow-y-scroll">
+				{!!filtered &&
+					filtered.active.todos.map((todo) => {
+						return (
+							<TodoCard key={todo.key} todo={todo} filters={filters} dispatch={dispatch} refresh={refreshSummary} />
+						);
+					})
+				}
+				</div>
+			</main>
+		</SidebarProvider>
 	);
 }
 

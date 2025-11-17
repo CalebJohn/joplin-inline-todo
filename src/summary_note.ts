@@ -1,5 +1,5 @@
 import joplin from 'api';
-import { Note, Summary} from './types';
+import { Note, Summary, SummaryMap } from './types';
 
 const summary_regex = /<!-- inline-todo-plugin(.*)-->/gm;
 
@@ -27,19 +27,19 @@ export function insertNewSummary(old_body: string, summaryBody: string): string 
 	return spl.join('');
 }
 
-export function filterSummaryCategories(body: string, summary_map: Summary): Summary {
+export function filterSummaryCategories(body: string, summary: Summary): SummaryMap {
 	summary_regex.lastIndex = 0;
 	const match = summary_regex.exec(body);
 	if (match === null) {
 		console.error("filterSummaryCategories called on a note with no summary comment");
 		console.error(body);
 		// This would be a bug if it happens but ¯\_(ツ)_/¯
-		return summary_map;
+		return summary.map;
 	}
 	const notebook_string = match[1].trim();
 
 	// No filtering necessary
-	if (!notebook_string) { return summary_map; }
+	if (!notebook_string) { return summary.map; }
 
 
 	// notebooks is a string with notebook names seperated by whitespace.
@@ -47,8 +47,8 @@ export function filterSummaryCategories(body: string, summary_map: Summary): Sum
 	// So we'll have to hand off the parsing to an actual parser
 	const notebooks = parseNotebookNames(notebook_string);
 
-	let new_summary: Summary = {};
-	for (const [id, todos] of Object.entries(summary_map)) {
+	let new_summary: SummaryMap = {};
+	for (const [id, todos] of Object.entries(summary.map)) {
 		const entry = todos.filter(todo => notebooks.includes(todo.parent_title));
 		if (entry.length > 0) {
 			new_summary[id] = entry;

@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"outDir": "./dist/",
 		"module": "commonjs",
-		"target": "es2015",
-		"jsx": "react",
+		"target": "es2017",
+		"jsx": "react-jsx",
 		"allowJs": true,
 		"baseUrl": ".",
 		"paths": {

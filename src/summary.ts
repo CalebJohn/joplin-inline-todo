@@ -4,11 +4,11 @@ import { summaries } from './settings_tables';
 import { insertNewSummary, filterSummaryCategories } from './summary_note';
 // import { icalBlock } from './ical';
 
-export async function update_summary(summary_map: Summary, settings: Settings, summary_id: string, old_body: string) {
+export async function update_summary(summary: Summary, settings: Settings, summary_id: string, old_body: string) {
 	let bodyFunc = summaries[settings.summary_type].func;
 
 	// Use the summary special comment to filter the todos for this summary note
-	const filtered_map = filterSummaryCategories(old_body, summary_map);
+	const filtered_map = filterSummaryCategories(old_body, summary);
 
 	let summaryBody = await bodyFunc(filtered_map, settings);
 
