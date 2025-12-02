@@ -41,7 +41,7 @@ export const regexes = {
 	list: {
 		title: 'Metalist Style',
 		// change to find completed todo
-		regex: /(^\s*- \[[ |x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
+		regex: /(^\s*- \[[ x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = todo[1].match(/(?<=\s@)([^\s]+)/);
@@ -97,7 +97,7 @@ export const regexes = {
 	},
 	plain: {
 		title: 'List Style',
-		regex: /(^\s*- \[[ |x]\] ()()([^\n]*)$)((?:\n[^\S\n]+.+$)*)/gm,
+		regex: /(^\s*- \[[ x]\] ()()([^\n]*)$)((?:\n[^\S\n]+[-*+] (?!\[[ x]\]).+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = regexes.list.category(todo);
