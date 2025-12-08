@@ -1,6 +1,3 @@
-
-
-
 function arrayToOptions(arr: string[]) {
 	return arr.map((i) => ({
 		label: i,
@@ -43,4 +40,3 @@ export const selectStyles = {
     color: state.isFocused ? 'var(--joplin-color3)' : 'var(--joplin-color)',
   }),
 };
-

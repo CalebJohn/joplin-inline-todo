@@ -1,25 +1,21 @@
 import * as React from "react"
 import { useState } from 'react';
-import { useIsMobile } from "@/src/gui/hooks/use-mobile"
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuPortal,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/src/gui/components/ui/dropdown-menu"
+
+// import {
+// 	DropdownMenu,
+// 	DropdownMenuContent,
+// 	DropdownMenuGroup,
+// 	DropdownMenuItem,
+// 	DropdownMenuLabel,
+// 	DropdownMenuPortal,
+// 	DropdownMenuSub,
+// 	DropdownMenuSubContent,
+// 	DropdownMenuSubTrigger,
+// 	DropdownMenuTrigger,
+// } from "@/src/gui/components/ui/dropdown-menu"
 import { Filters, Todo, WebviewApi } from "../types"
 import { Notebook } from "lucide-react"
-import Logger from "@joplin/utils/Logger";
 
-const logger = Logger.create('inline-todo: TodoCard');
-
-declare var webviewApi: WebviewApi;
 
 // without a timezone, dates will be interpreted as UTC.
 // We do the below trickery so that the local date is handled as local
@@ -85,118 +81,64 @@ interface Props {
 	todo: Todo;
 	filters: Filters;
 	dispatch: (o) => void;
-	refresh: () => void;
+	webviewApi: WebviewApi;
 }
 
-const TodoCard: React.FC<Props> = (props: Props) => {
-	const isMobile = useIsMobile();
-	const [checked, setChecked] = useState(props.todo.completed || props.filters.checked.hasOwnProperty(props.todo.key));
+export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
+	const [checked, setChecked] = useState(todo.completed || filters.checked.hasOwnProperty(todo.key));
 
 	const markDone = async (event) => {
 		setChecked(c => !c);
 
 		if (!checked) {
-			props.dispatch({ type: 'check', key: props.todo.key });
+			dispatch({ type: 'check', key: todo.key });
 		}
 		// We don't need to "uncheck" because a new summary will be generated, and unchecking will happen then
 
-		await webviewApi.postMessage({ type: 'markDone', value: {...props.todo, completed: !checked} });
+		await webviewApi.postMessage({ type: 'markDone', value: {...todo, completed: !checked} });
 	}
 
 	const jumpTo = async () => {
-		await webviewApi.postMessage({ type: 'jumpTo', value: props.todo });
+		await webviewApi.postMessage({ type: 'jumpTo', value: todo });
 	}
 
+	// const handleDateSelection = (e, option) => {
+	// 	e.stopPropagation();
 
-	const handleDateSelection = (e, option) => {
-		e.stopPropagation();
+	// 	// TODO: create a date_utils lib
+	// 	// use it to get a datetime here
+	// 	// Then below use it to transform the datetime as necessary
+	// 	// then post a message that issues a change date command
 
-		// TODO: create a date_utils lib
-		// use it to get a datetime here
-		// Then below use it to transform the datetime as necessary
-		// then post a message that issues a change date command
-
-		switch (option) {
-			case 'today':
-				logger.warn('today');
-				break;
-			case 'tomorrow':
-				// setDueDate(getTomorrow());
-				break;
-			case 'friday':
-				// setDueDate(getFriday());
-				break;
-			case 'nextweek':
-				// setDueDate(getNextWeek());
-				break;
-			case 'clear':
-				// setDueDate(null);
-				// setCustomDate(null);
-				break;
-			case 'custom':
-				// setShowCustomDate(true);
-				break;
-			default:
-				break;
-		}
-	};
+	// 	switch (option) {
+	// 		case 'today':
+	// 			logger.warn('today');
+	// 			break;
+	// 		case 'tomorrow':
+	// 			// setDueDate(getTomorrow());
+	// 			break;
+	// 		case 'friday':
+	// 			// setDueDate(getFriday());
+	// 			break;
+	// 		case 'nextweek':
+	// 			// setDueDate(getNextWeek());
+	// 			break;
+	// 		case 'clear':
+	// 			// setDueDate(null);
+	// 			// setCustomDate(null);
+	// 			break;
+	// 		case 'custom':
+	// 			// setShowCustomDate(true);
+	// 			break;
+	// 		default:
+	// 			break;
+	// 	}
+	// };
 
 	const checkTodo = async (event) => {
 		event.stopPropagation();
 	};
 
-	// Condensed
-	// <div className={checked ? 'opacity-50' : ''}>
-	//	<div className="py-2 px-3 text-sm mx-auto rounded-lg transition-colors hover:bg-hover">
-	//		<div className="flex items-start gap-3">
-	//			<label className="flex items-center cursor-pointer p-2 -m-2 h-5">
-	//				<input
-	//					type="checkbox"
-	//					checked={checked}
-	//					onChange={markDone}
-	//					onClick={props.checkTodo}
-	//					className="cursor-pointer"
-	//				/>
-	//			</label>
-
-	//			<div className="flex-1 min-w-0">
-	//				<a className="block cursor-pointer" onClick={jumpTo}>
-	//					<p className="text-sm font-normal mb-1">
-	//						{props.todo.msg}
-	//					</p>
-	//				</a>
-
-	//				<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-	//					{props.todo.date && (
-	//						<span className="flex items-center gap-1">
-	//							<svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-	//								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-	//							</svg>
-	//							{formatDate(props.todo.date)}
-	//						</span>
-	//					)}
-
-	//					<span className="flex items-center gap-1">
-	//						<Notebook className="w-3 h-3" />
-	//						{props.todo.parent_title}
-	//					</span>
-
-	//					{!isMobile && props.todo.tags.length > 0 && (
-	//						<>
-	//							{props.todo.tags.map((tag, index) => (
-	//								<span key={index} className="inline-flex items-center">
-	//									#{tag}
-	//								</span>
-	//							))}
-	//						</>
-	//					)}
-	//				</div>
-	//			</div>
-	//		</div>
-	//	</div>
-	// </div>
-	//
-	//
 	// Date Adjustment dropdown
 				// 	<DropdownMenu>
 				// 		<DropdownMenuTrigger asChild>
@@ -232,30 +174,30 @@ const TodoCard: React.FC<Props> = (props: Props) => {
 
 		<div className="min-w-0">
 			<p>
-				{props.todo.msg}
+				{todo.msg}
 			</p>
 
 			<div className="flex items-center flex-wrap gap-3 opacity-70 text-xs">
-				{props.todo.date && (
-					<div className={'flex-shrink-0 text-xs '+ dateColor(props.todo)} title={props.todo.date}>
-						{formatDate(props.todo.date)}
+				{todo.date && (
+					<div className={'shrink-0 text-xs '+ dateColor(todo)} title={todo.date}>
+						{formatDate(todo.date)}
 					</div>
 				)}
 
 				<span className="flex items-center gap-1">
 					<span className="text-xs flex items-center gap-1">
-						<Notebook className="size-3" />{props.todo.parent_title} &gt;
+						<Notebook className="size-3" />{todo.parent_title} &gt;
 					</span>
-					<span className="text-xs">{props.todo.note_title}</span>
+					<span className="text-xs">{todo.note_title}</span>
 				</span>
-				{props.todo.category &&
+				{todo.category &&
 					<span className="inline-flex items-center text-xs font-medium">
-						@{props.todo.category}
+						@{todo.category}
 					</span>
 				}
 				<span className="flex items-center gap-1">
 				{
-					props.todo.tags.map((tag) => {
+					todo.tags.map((tag) => {
 						return (
 							<span key={tag} className="text-xs text-foreground">+{tag}</span>
 						);
@@ -268,5 +210,3 @@ const TodoCard: React.FC<Props> = (props: Props) => {
 </div>
 	);
 }
-
-export default TodoCard;

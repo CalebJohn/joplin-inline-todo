@@ -101,10 +101,10 @@ export default (props: Props) => {
 
 	useEffect(() => {
 		const getSavedFilters = async() => {
-			logger.info('Getting filters on first launch');
 			const newFilters: Filters = await props.webviewApi.postMessage({ type: 'getFilters' });
 			// newFilters will be undefined on first launch, so ignore the result
 			if (!!newFilters) {
+				console.info("Received new Filters:" + newFilters);
 				dispatch({
 					type: 'firstSet',
 					filters: {...newFilters, checked: syncChecked(newFilters.checked, props.summary)},
@@ -120,7 +120,6 @@ export default (props: Props) => {
 	useEffect(() => {
 		const fn = async() => {
 			if (filters !== initialFilters) {
-				logger.info("Saving filters on change");
 				await props.webviewApi.postMessage({ type: 'setFilters', value: filters });
 			}
 		}

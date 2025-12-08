@@ -12,7 +12,6 @@ interface Props {
 
 export function FilterNameDialogComponent({ defaultName, saveAndClose }: Props) {
 	const [filterName, setFilterName] = useState(defaultName);
-	const [open, setOpen] = useState(false);
 
 	const saveName = () => {
 		saveAndClose(filterName);

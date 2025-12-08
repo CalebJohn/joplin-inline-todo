@@ -16,7 +16,7 @@ function addStableKey(todo: Todo): Todo {
 }
 
 // This handles the loading and updating for all data that is read-only from the plugin
-// point of view
+// point of view (contrast to the useFilters hook)
 export default (props: Props) => {
 	const [summary, setSummary] = useState<Todo[]>([]);
 	const [settings, setSettings] = useState<Settings>(null);
@@ -33,8 +33,6 @@ export default (props: Props) => {
 
 	useEffect(() => {
 		const fn = async() => {
-			logger.info('Getting plugin data on first launch');
-
 			refreshSummary();
 
 			// Settings are passed as a JSON string in order to support more complex data types

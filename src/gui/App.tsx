@@ -1,14 +1,12 @@
 import * as React from "react"
-import { useState } from 'react';
 import calcFiltered from "./lib/filters";
 import collectUnique from "./lib/collectUnique";
 import useFilters from './hooks/useFilters';
 import usePluginData from './hooks/usePluginData';
-import { Settings, Summary, Todo, WebviewApi } from "../types";
-import TodoCard from "./TodoCard"
-import FilterSidebar from "./Sidebar"
+import { WebviewApi } from "../types";
+import { TodoCard } from "./TodoCard"
+import { FilterSidebar } from "./Sidebar"
 import { RefreshButton } from "./RefreshButton";
-import { ScrollArea } from "@/src/gui/components/ui/scroll-area"
 import { Separator } from "@/src/gui/components/ui/separator"
 import { SidebarProvider, SidebarTrigger } from "@/src/gui/components/ui/sidebar"
 import Logger from "@joplin/utils/Logger";
@@ -51,7 +49,7 @@ export default function App() {
 				{!!filtered &&
 					filtered.active.todos.map((todo) => {
 						return (
-							<TodoCard key={todo.key} todo={todo} filters={filters} dispatch={dispatch} refresh={refreshSummary} />
+							<TodoCard key={todo.key} todo={todo} filters={filters} dispatch={dispatch} webviewApi={webviewApi} />
 						);
 					})
 				}
@@ -60,4 +58,3 @@ export default function App() {
 		</SidebarProvider>
 	);
 }
-

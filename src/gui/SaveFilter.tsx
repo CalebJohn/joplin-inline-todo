@@ -2,8 +2,6 @@ import * as React from "react";
 import { useState } from "react";
 import { FilterNameDialogComponent } from './FilterNameDialog';
 import { Button } from "@/src/gui/components/ui/button";
-import { Input } from "@/src/gui/components/ui/input"
-import { Label } from "@/src/gui/components/ui/label";
 import {
   Popover,
   PopoverContent,

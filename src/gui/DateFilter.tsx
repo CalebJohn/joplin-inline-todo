@@ -1,7 +1,6 @@
 import * as React from "react"
 import { SelectFilterComponent } from "./SelectFilter";
 import { DateFilter } from "../types";
-import { Label } from "@/src/gui/components/ui/label"
 import { groupsToOptions } from "./lib/selectUtils";
 
 

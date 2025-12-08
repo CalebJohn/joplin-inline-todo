@@ -5,12 +5,12 @@ import { insertNewSummary, filterSummaryCategories } from './summary_note';
 // import { icalBlock } from './ical';
 
 export async function update_summary(summary: Summary, settings: Settings, summary_id: string, old_body: string) {
-	let bodyFunc = summaries[settings.summary_type].func;
+	const bodyFunc = summaries[settings.summary_type].func;
 
 	// Use the summary special comment to filter the todos for this summary note
 	const filtered_map = filterSummaryCategories(old_body, summary);
 
-	let summaryBody = await bodyFunc(filtered_map, settings);
+	const summaryBody = await bodyFunc(filtered_map, settings);
 
 	// if (settings.add_ical_block) {
 	// 	summaryBody += icalBlock(filtered_map, settings);
@@ -38,6 +38,7 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 			await joplin.commands.execute('editor.setText', body);
 		} catch (error) {
 			console.warn("Could not update summary note with editor.setText: " + summary_id);
+			console.error(error);
 		}
 	}
 

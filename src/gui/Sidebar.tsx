@@ -1,8 +1,5 @@
 import * as React from "react";
-import { Calendar, Home, Inbox, Search, Settings } from "lucide-react";
-
-import { FilterX, MoreHorizontal } from "lucide-react";
-
+import { FilterX } from "lucide-react";
 import { CheckFilterComponent } from "./CheckFilter"
 import { DateFilterComponent } from "./DateFilter"
 import { SaveFilterComponent } from "./SaveFilter"
@@ -32,7 +29,7 @@ interface Props {
 	uniqueFields: UniqueFields;
 }
 
-export default function FilterSidebar({ dispatch, filtered, filters, uniqueFields }: Props) {
+export function FilterSidebar({ dispatch, filtered, filters, uniqueFields }: Props) {
 	const clearActiveFilter = () => {
 		dispatch({ type: 'clearActive' });
 	};

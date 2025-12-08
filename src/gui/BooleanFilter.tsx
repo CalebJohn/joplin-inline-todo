@@ -6,7 +6,7 @@ import {
   CollapsibleTrigger,
 } from "@/src/gui/components/ui/collapsible";
 import { SidebarMenuButton, SidebarMenuItem } from "@/src/gui/components/ui/sidebar";
-import { ChevronRight, X } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: BooleanFilter');
