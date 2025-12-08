@@ -3,6 +3,7 @@ import calcFiltered from "./lib/filters";
 import collectUnique from "./lib/collectUnique";
 import useFilters from './hooks/useFilters';
 import usePluginData from './hooks/usePluginData';
+import { useIsMobile } from './hooks/use-mobile';
 import { WebviewApi } from "../types";
 import { TodoCard } from "./TodoCard"
 import { FilterSidebar } from "./Sidebar"
@@ -21,6 +22,8 @@ export default function App() {
 
 	const [filters, dispatch] = useFilters({ webviewApi, summary });
 
+	const isMobile = useIsMobile();
+
 	const filtered = calcFiltered(summary, filters);
 	const uniqueFields = collectUnique(summary);
 
@@ -31,8 +34,10 @@ export default function App() {
 		uniqueFields,
 	};
 
+	// The parent container has a 10px border, so we need to subtract 20px from the width
+	// to make the plugin fit perfectly
 	return (
-		<SidebarProvider>
+		<SidebarProvider style={{ width: isMobile ? window.innerWidth - 20 : '100%' }}>
 			<FilterSidebar {...sidebarProps} />
 			<main className="todo-editor flex flex-col flex-1 min-w-0">
 				<header className="flex h-12 shrink-0 items-center gap-2 border-b px-4">
