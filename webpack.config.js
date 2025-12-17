@@ -176,11 +176,22 @@ const baseConfig = {
 	mode: 'production',
 	target: 'node',
 	stats: 'errors-only',
+	// Enable if I ever feel like I need the extra couple of seconds
+	// cache: {
+	// 	type: 'filesystem',
+	// 	buildDependencies: {
+	// 		config: [__filename],
+	// 	},
+	// },
 	module: {
 		rules: [
 			{
 				test: /\.tsx?$/,
-				use: 'ts-loader',
+				loader: 'esbuild-loader',
+				options: {
+					loader: 'tsx',  // handles both .ts and .tsx
+					target: 'es2015',  // matches tsconfig.json target
+				},
 				exclude: /node_modules/,
 			},
 		],
@@ -204,6 +215,21 @@ const pluginConfig = { ...baseConfig, entry: './src/index.ts',
 		path: distDir,
 	},
 	plugins: [
+		// Build Tailwind CSS before webpack processes files
+		{
+			apply(compiler) {
+				compiler.hooks.beforeRun.tap('buildTailwindCSS', () => {
+					console.info(chalk.cyan('Building Tailwind CSS...'));
+					try {
+						execSync('npx @tailwindcss/cli -i ./src/gui/style/input.css -o ./src/gui/style/output.css', { stdio: 'inherit' });
+						console.info(chalk.cyan('Tailwind CSS built successfully'));
+					} catch (error) {
+						console.error(chalk.red('Failed to build Tailwind CSS:', error.message));
+						throw error;
+					}
+				});
+			},
+		},
 		new CopyPlugin({
 			patterns: [
 				{
