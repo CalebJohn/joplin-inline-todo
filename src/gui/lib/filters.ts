@@ -36,6 +36,9 @@ function filterSingleDate(todo: Todo, duration: Duration, now: DateTime): boolea
 	if (!todo.date) { return false; }
 	const dueDate = DateTime.fromISO(todo.date);
 
+	// Check if the date is valid
+	if (!dueDate.isValid) { return false; }
+
 	const end = now.plus(duration);
 	return dueDate < end;
 }
@@ -62,18 +65,18 @@ function filterTags(todos: Todo[], filters: string[]): Todo[] {
 	if (filters.length === 0) { return todos; }
 	if (filters.length === 1) {
 		const filter = filters[0];
-		return todos.filter(t => t.tags.indexOf(filter) >= 0);
+		return todos.filter(t => t.tags && t.tags.indexOf(filter) >= 0);
 	}
 
 	const filterSet = new Set(filters);
 
-	return todos.filter(t => matchAny(filterSet, t.tags));
+	return todos.filter(t => t.tags && matchAny(filterSet, t.tags));
 }
 
 function filterStrings(todos: Todo[], filterObject: Filter, field: string): Todo[] {
 	const filters: string[] = filterObject[field]
 
-	if (filters.length === 0) { return todos; }
+	if (!filters || filters.length === 0) { return todos; }
 	if (filters.length === 1) {
 		const filter = filters[0];
 		return todos.filter(t => t[field] === filter);
