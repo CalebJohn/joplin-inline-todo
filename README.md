@@ -126,6 +126,35 @@ Todos can be filtered such that the plugin will only display Todos from specific
 <!-- inline-todo-plugin Work "Special Project" -->
 ```
 
+## Custom Editor (GUI View)
+The plugin includes an optional custom editor that replaces the markdown summary note with an interactive GUI. This gives you a more visual way to work with your TODOs, with the ability to filter, sort, and manage tasks directly from the interface.
+
+The powerful feature of the custom editor is the **saved filters**. Instead of having a single view of all your TODOs, you can create multiple named filter views that each show a different subset of your tasks. For example, you might have:
+- A "Work" filter showing only TODOs from work-related notebooks
+- A "This Week" filter showing only TODOs due in the next 7 days
+- A "High Priority" filter for tasks with specific tags or categories
+- A "Project X" filter combining specific notebooks, categories, and tags
+
+Each saved filter appears in the sidebar with a count of open TODOs matching that filter, making it easy to see at a glance what needs attention. You can quickly switch between filters to get different perspectives on your TODO list without creating multiple summary notes.
+
+Filters can combine criteria including:
+- Notebooks
+- Notes
+- Categories (@category)
+- Tags (+tag)
+- Due dates (relative to the current date)
+- Completion status
+
+### Enabling the Custom Editor
+The custom editor is currently off by default, but will be enabled by default in a future release.
+
+To enable it now:
+1. Go to `Tools -> Options -> Inline TODO` (Windows/Linux) or `Joplin -> Preferences -> Inline TODO` (macOS)
+2. Check the box for "Enable custom editor for summary notes"
+3. Open or navigate to your TODO summary note
+
+The custom editor will automatically activate when you open a summary note (any note containing the `<!-- inline-todo-plugin -->` comment). If it doesn't open automatically, press the eye icon in the top right corner of the screen, this eye is used to toggle between the typical Joplin editor, and the new custom editor. You can click on TODOs to jump to their source note, mark them complete, or apply filters to focus on specific subsets of tasks.
+
 
 # Roadmap
 I consider this plugin to be finished (it meets my needs). But below are some ideas that I will implement in the future if I have some time.
