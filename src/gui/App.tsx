@@ -24,8 +24,8 @@ export default function App() {
 
 	const isMobile = useIsMobile();
 
-	const filtered = calcFiltered(summary, filters);
-	const uniqueFields = collectUnique(summary);
+	const filtered = React.useMemo(() => calcFiltered(summary, filters), [summary, filters]);
+	const uniqueFields = React.useMemo(() => collectUnique(summary), [summary]);
 
 	const sidebarProps = {
 		filters,

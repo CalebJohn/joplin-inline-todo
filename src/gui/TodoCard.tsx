@@ -87,7 +87,7 @@ interface Props {
 export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 	const [checked, setChecked] = useState(todo.completed || filters.checked.hasOwnProperty(todo.key));
 
-	const markDone = async (event) => {
+	const markDone = React.useCallback(async (event) => {
 		setChecked(c => !c);
 
 		if (!checked) {
@@ -96,11 +96,11 @@ export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 		// We don't need to "uncheck" because a new summary will be generated, and unchecking will happen then
 
 		await webviewApi.postMessage({ type: 'markDone', value: {...todo, completed: !checked} });
-	}
+	}, [checked, todo, dispatch, webviewApi]);
 
-	const jumpTo = async () => {
+	const jumpTo = React.useCallback(async () => {
 		await webviewApi.postMessage({ type: 'jumpTo', value: todo });
-	}
+	}, [todo, webviewApi]);
 
 	// const handleDateSelection = (e, option) => {
 	// 	e.stopPropagation();
@@ -135,9 +135,9 @@ export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 	// 	}
 	// };
 
-	const checkTodo = async (event) => {
+	const checkTodo = React.useCallback(async (event) => {
 		event.stopPropagation();
-	};
+	}, []);
 
 	// Date Adjustment dropdown
 				// 	<DropdownMenu>

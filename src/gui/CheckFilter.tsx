@@ -25,19 +25,19 @@ interface Props {
 
 
 export function CheckFilterComponent({ label, field, filter, items, defaultClosed, dispatch, getLabel }: Props) {
-	const options = items.map(item => ({
+	const options = React.useMemo(() => items.map(item => ({
 		value: item,
 		label: getLabel ? getLabel(item) : item
-	}));
+	})), [items, getLabel]);
 
 	// Convert filter array to react-select format
-	const selectValues = filter.map(item => ({
+	const selectValues = React.useMemo(() => filter.map(item => ({
 		value: item,
 		label: getLabel ? getLabel(item) : item
-	}));
+	})), [filter, getLabel]);
 
-	const handleCheck = (s: string) => {
-		const newFilter = filter.includes(s) 
+	const handleCheck = React.useCallback((s: string) => {
+		const newFilter = filter.includes(s)
 			? filter.filter(i => i !== s)
 			: [...filter, s];
 
@@ -46,21 +46,21 @@ export function CheckFilterComponent({ label, field, filter, items, defaultClose
 			field: field,
 			value: newFilter,
 		});
-	}
+	}, [filter, field, dispatch]);
 
-	const handleSelectChange = (selected) => {
-    const newFilter = selected ? selected.map(option => option.value) : [];
+	const handleSelectChange = React.useCallback((selected) => {
+		const newFilter = selected ? selected.map(option => option.value) : [];
 
 		dispatch({
 			type: "updateActiveField",
 			field: field,
 			value: newFilter,
 		});
-	}
+	}, [field, dispatch]);
 
-	const checkItem = async (event) => {
+	const checkItem = React.useCallback(async (event) => {
 		event.stopPropagation();
-	};
+	}, []);
 
 	return items.length > 0 && (
 		<Collapsible defaultOpen={!defaultClosed} className="group/collapsible">
