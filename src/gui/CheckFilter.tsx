@@ -20,19 +20,20 @@ interface Props {
 	items: string[];
 	defaultClosed?: boolean;
 	dispatch: (o) => void;
+	getLabel?: (value: string) => string;
 }
 
 
-export function CheckFilterComponent({ label, field, filter, items, defaultClosed, dispatch }: Props) {
+export function CheckFilterComponent({ label, field, filter, items, defaultClosed, dispatch, getLabel }: Props) {
 	const options = items.map(item => ({
 		value: item,
-		label: item
+		label: getLabel ? getLabel(item) : item
 	}));
 
 	// Convert filter array to react-select format
 	const selectValues = filter.map(item => ({
 		value: item,
-		label: item
+		label: getLabel ? getLabel(item) : item
 	}));
 
 	const handleCheck = (s: string) => {
@@ -81,7 +82,7 @@ export function CheckFilterComponent({ label, field, filter, items, defaultClose
 										onChange={() => handleCheck(item)}
 										onClick={checkItem} />
 									<Label htmlFor={item} className="text-sm">
-										{item}
+										{getLabel ? getLabel(item) : item}
 									</Label>
 								</div>
 							)))}

@@ -2,6 +2,7 @@ import * as React from "react";
 import { FilterX } from "lucide-react";
 import { CheckFilterComponent } from "./CheckFilter"
 import { DateFilterComponent } from "./DateFilter"
+import { NoteFilterComponent } from "./NoteFilter"
 import { SaveFilterComponent } from "./SaveFilter"
 import { SavedFiltersComponent } from "./SavedFilters"
 import { SelectFilterComponent } from "./SelectFilter";
@@ -17,7 +18,7 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 } from "@/src/gui/components/ui/sidebar";
-import { Filtered, Filters, UniqueFields } from "../types";
+import { Filtered, Filters, Todo, UniqueFields } from "../types";
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: Sidebar.tsx');
@@ -27,9 +28,10 @@ interface Props {
 	filtered: Filtered;
 	filters: Filters;
 	uniqueFields: UniqueFields;
+	todos: Todo[];
 }
 
-export function FilterSidebar({ dispatch, filtered, filters, uniqueFields }: Props) {
+export function FilterSidebar({ dispatch, filtered, filters, uniqueFields, todos }: Props) {
 	const clearActiveFilter = () => {
 		dispatch({ type: 'clearActive' });
 	};
@@ -53,11 +55,9 @@ export function FilterSidebar({ dispatch, filtered, filters, uniqueFields }: Pro
 							<DateFilterComponent label="Show Upcoming" title="Always show todos that match this filter"field="dateOverride" filter={filters.active.dateOverride} dispatch={dispatch} />
 							<CheckFilterComponent label="Category" field="category" filter={filters.active.category} items={uniqueFields.category} dispatch={dispatch} />
 							<CheckFilterComponent label="Tags" field="tags" filter={filters.active.tags} items={uniqueFields.tags} dispatch={dispatch} />
-							<CheckFilterComponent label="Note" field="note_title" filter={filters.active.note_title} items={uniqueFields.note_title} dispatch={dispatch} />
-							<CheckFilterComponent label="Notebook" field="parent_title" filter={filters.active.parent_title} items={uniqueFields.parent_title} dispatch={dispatch} />
+							<NoteFilterComponent label="Note" field="note" filter={filters.active.note} todos={todos} dispatch={dispatch} />
+							<NoteFilterComponent label="Notebook" field="parent_id" filter={filters.active.parent_id} todos={todos} dispatch={dispatch} />
 							<SelectFilterComponent label="Show Completed" field="completed" filter={filters.active.completed} groups={groupsToOptions({"": ["None", "Today", "This Week", "This Month", "This Year", "All Time"]})} defaultClosed={true} dispatch={dispatch} />
-							<CheckFilterComponent label="Note ID" field="note" filter={filters.active.note} items={uniqueFields.note} defaultClosed={true} dispatch={dispatch} />
-							<CheckFilterComponent label="Notebook ID" field="parent_id" filter={filters.active.parent_id} items={uniqueFields.parent_id} defaultClosed={true} dispatch={dispatch} />
 						</SidebarMenu>
 					</SidebarGroupContent>
 				</SidebarGroup>

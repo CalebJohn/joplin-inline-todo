@@ -32,6 +32,7 @@ export default function App() {
 		dispatch,
 		filtered,
 		uniqueFields,
+		todos: summary,
 	};
 
 	// The parent container has a 10px border, so we need to subtract 20px from the width
