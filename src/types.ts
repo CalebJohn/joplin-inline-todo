@@ -85,9 +85,7 @@ export type CompletedFilter = string;
 export interface Filter {
 	filterName: string;
 	note: string[];
-	note_title: string[];
 	parent_id: string[];
-	parent_title: string[];
 	msg: string[]; // message contains
 	category: string[];
 	date: DateFilter;
@@ -124,9 +122,7 @@ export interface Filtered {
 
 export interface UniqueFields {
 	note: string[];
-	note_title: string[];
 	parent_id: string[];
-	parent_title: string[];
 	category: string[];
 	tags: string[];
 }

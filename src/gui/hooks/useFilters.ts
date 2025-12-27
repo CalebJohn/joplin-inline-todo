@@ -14,9 +14,7 @@ interface Props {
 const emptyFilter = {
 	filterName: '',
 	note: [],
-	note_title: [],
 	parent_id: [],
-	parent_title: [],
 	msg: [],
 	category: [],
 	date: 'All',

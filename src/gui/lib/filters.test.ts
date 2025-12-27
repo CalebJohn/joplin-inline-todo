@@ -65,9 +65,7 @@ describe('filters', () => {
 	const createFilter = (overrides: Partial<Filter> = {}): Filter => ({
 		filterName: 'Test Filter',
 		note: [],
-		note_title: [],
 		parent_id: [],
-		parent_title: [],
 		msg: [],
 		category: [],
 		date: 'All',
@@ -309,8 +307,6 @@ describe('filters', () => {
 		});
 
 		test.each([
-			['note_title', 'Meeting Notes', 'Project Plan', 'note1'],
-			['parent_title', 'Notebook A', 'Notebook B', 'task1'],
 			['note', 'note-id-1', 'note-id-2', 'task1'],
 			['parent_id', 'parent-1', 'parent-2', 'task1'],
 		] as const)('filters by %s field', (field, matchValue, otherValue, expectedKey) => {
@@ -672,8 +668,6 @@ describe('filters', () => {
 				saved: [],
 				active: createFilter({
 					category: ['work'],
-					note_title: ['Important Note'],
-					parent_title: ['Work Notebook'],
 					tags: ['urgent'],
 					date: 'Today',
 					completed: 'None',
@@ -946,8 +940,6 @@ describe('filters', () => {
 					category: '',
 					date: '',
 					tags: [],
-					note_title: '',
-					parent_title: '',
 				}),
 			];
 			const filters: Filters = {
@@ -1160,26 +1152,6 @@ describe('filters', () => {
 				expect(keys).toContain('normal');
 				expect(keys).not.toContain('undefined-tags');
 			});
-
-			test('handles null note_title', () => {
-				const todos = [
-					createTodo({ key: 'null-title', note_title: null as any }),
-					createTodo({ key: 'normal', note_title: 'My Note' }),
-				];
-				const keys = getFilteredKeys(todos, { note_title: ['My Note'] });
-				expect(keys).toContain('normal');
-				expect(keys).not.toContain('null-title');
-			});
-
-			test('handles null parent_title', () => {
-				const todos = [
-					createTodo({ key: 'null-parent', parent_title: null as any }),
-					createTodo({ key: 'normal', parent_title: 'Notebook' }),
-				];
-				const keys = getFilteredKeys(todos, { parent_title: ['Notebook'] });
-				expect(keys).toContain('normal');
-				expect(keys).not.toContain('null-parent');
-			});
 		});
 
 		describe('special characters in fields', () => {
@@ -1225,24 +1197,6 @@ describe('filters', () => {
 				});
 			});
 
-			test('handles special characters in note titles', () => {
-				const specialTitles = [
-					'Note with "quotes"',
-					'Note with <html> tags',
-					'Note with & ampersand',
-					'Note with émojis 🎉',
-					'Note\nwith\nnewlines',
-				];
-
-				specialTitles.forEach((title, index) => {
-					const todos = [
-						createTodo({ key: `title-${index}`, note_title: title }),
-					];
-					const keys = getFilteredKeys(todos, { note_title: [title] });
-					expect(keys).toContain(`title-${index}`);
-				});
-			});
-
 			test('handles Unicode and emoji in various fields', () => {
 				const todos = [
 					createTodo({
@@ -1256,8 +1210,6 @@ describe('filters', () => {
 				const keys = getFilteredKeys(todos, {
 					category: ['工作'],
 					tags: ['紧急'],
-					note_title: ['会议笔记 📝'],
-					parent_title: ['Тетрадь'],
 				});
 				expect(keys).toContain('unicode-test');
 			});

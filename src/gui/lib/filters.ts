@@ -123,8 +123,6 @@ function calcSingleFilter(summary: Todo[], filter: Filter, checked: Checked): Ac
 
 	todos = filterStrings(todos, filter, "category");
 	todos = filterTags(todos, filter.tags);
-	todos = filterStrings(todos, filter, "note_title");
-	todos = filterStrings(todos, filter, "parent_title");
 	todos = filterStrings(todos, filter, "note");
 	todos = filterStrings(todos, filter, "parent_id");
 	todos = filterDate(todos, filter.date);
