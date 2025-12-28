@@ -159,14 +159,14 @@ joplin.plugins.register({
 			label: "Toggle TODO",
 			execute: async () => {
 				const currentNote = await joplin.workspace.selectedNote();
-				if (!isSummary(currentNote)) { return; }
+				if (!currentNote || !isSummary(currentNote)) { return; }
 				mark_current_line_as_done(builder, currentNote);
 			},
 		});
 
 		joplin.workspace.filterEditorContextMenu(async (object: any) => {
 			const currentNote = await joplin.workspace.selectedNote();
-			if (!isSummary(currentNote)) { return object; }
+			if (!currentNote || !isSummary(currentNote)) { return object; }
 
 			const newItems: MenuItem[] = [
 				{
@@ -236,7 +236,7 @@ joplin.plugins.register({
 		await joplin.workspace.onNoteSelectionChange(async () => {
 			const currentNote = await joplin.workspace.selectedNote();
 
-			if (builder.settings.auto_refresh_summary && isSummary(currentNote)) {
+			if (currentNote && builder.settings.auto_refresh_summary && isSummary(currentNote)) {
 				await builder.search_in_all();
 				update_summary(builder.summary, builder.settings, currentNote.id, currentNote.body);
 			}

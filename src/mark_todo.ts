@@ -19,7 +19,7 @@ export async function mark_current_line_as_done(builder: SummaryBuilder, current
 				.catch((error) => {
 					logger.error(error);
 					logger.warn("Could not read note with api: " + todo.note);
-					return { };
+					return;
 				});
 		if (!origin) {
 			logger.error("Could not mark current line as done, see errors above");

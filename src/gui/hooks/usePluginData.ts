@@ -36,8 +36,14 @@ export default (props: Props) => {
 			refreshSummary();
 
 			// Settings are passed as a JSON string in order to support more complex data types
-			const newSettings: string = await props.webviewApi.postMessage({ type: 'getSettings' });
-			setSettings(JSON.parse(newSettings));
+			try {
+				const newSettings: string = await props.webviewApi.postMessage({ type: 'getSettings' });
+				setSettings(JSON.parse(newSettings));
+			} catch (error) {
+				logger.error('Failed to parse settings JSON:', error);
+				logger.warn('Settings data received:', newSettings);
+				// Keep settings as null, which will be handled by the consuming components
+			}
 		}
 
 		void fn();

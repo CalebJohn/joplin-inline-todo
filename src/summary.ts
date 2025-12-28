@@ -33,7 +33,7 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 
 	// https://github.com/laurent22/joplin/issues/5955
 	const currentNote = await joplin.workspace.selectedNote();
-	if (currentNote.id == summary_id) {
+	if (currentNote && currentNote.id == summary_id) {
 		try {
 			await joplin.commands.execute('editor.setText', body);
 		} catch (error) {

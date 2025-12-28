@@ -28,6 +28,8 @@ export class SummaryBuilder {
 		let folder = await this.get_parent_title(note.parent_id);
 		let match;
 		const todo_type = this._settings.todo_type;
+		// Reset regex state to ensure clean scan even if previous execution was interrupted
+		todo_type.regex.lastIndex = 0;
 		while ((match = todo_type.regex.exec(note.body)) !== null) {
 			matches.push({
 				note: note.id,

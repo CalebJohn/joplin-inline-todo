@@ -10,7 +10,11 @@ function summaryString(notebooks: string): string {
 }
 
 export async function createSummaryNote() {
-	const par = await joplin.workspace.selectedFolder()
+	const par = await joplin.workspace.selectedFolder();
+	if (!par) {
+		console.error("Cannot create summary note: no folder selected");
+		return;
+	}
 	await joplin.data.post(['notes'], null, {title: 'Todo Summary', parent_id: par.id, body: summaryString(' ')})
 			.catch((error) => {
 				console.error(error);
