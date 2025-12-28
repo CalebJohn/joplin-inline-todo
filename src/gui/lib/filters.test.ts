@@ -1,10 +1,10 @@
 import calcFiltered from './filters';
 import { Todo, Filter, Filters, Checked, ActiveFiltered } from '../../types';
 import { DateTime } from 'luxon';
+import { createTodo, createFilter } from '../../__test-utils__/factories';
+import { mockNow, dateFixtures, getFilteredKeys } from '../../__test-utils__/helpers';
 
 describe('filters', () => {
-	const mockNow = DateTime.fromISO('2024-06-15T12:00:00Z', { zone: 'utc' });
-
 	beforeAll(() => {
 		jest.spyOn(DateTime, 'now').mockReturnValue(mockNow);
 	});
@@ -12,79 +12,6 @@ describe('filters', () => {
 	afterAll(() => {
 		jest.restoreAllMocks();
 	});
-
-	const dateFixtures = {
-		past: {
-			yesterday: mockNow.minus({ days: 1 }).toISODate(),
-			lastWeek: mockNow.minus({ days: 7 }).toISODate(),
-			tenDaysAgo: mockNow.minus({ days: 10 }).toISODate(),
-			lastMonth: mockNow.minus({ days: 40 }).toISODate(),
-			threeMonthsAgo: mockNow.minus({ months: 3 }).toISODate(),
-			lastYear: mockNow.minus({ years: 1 }).toISODate(),
-		},
-		present: {
-			today: mockNow.toISODate(),
-		},
-		future: {
-			tomorrow: mockNow.plus({ days: 1 }).toISODate(),
-			dayAfterTomorrow: mockNow.plus({ days: 2 }).toISODate(),
-			inThreeDays: mockNow.plus({ days: 3 }).toISODate(),
-			inSixDays: mockNow.plus({ days: 6 }).toISODate(),
-			inEightDays: mockNow.plus({ days: 8 }).toISODate(),
-			inTenDays: mockNow.plus({ days: 10 }).toISODate(),
-			inFifteenDays: mockNow.plus({ days: 15 }).toISODate(),
-			inTwentyDays: mockNow.plus({ days: 20 }).toISODate(),
-			inFortyDays: mockNow.plus({ days: 40 }).toISODate(),
-		},
-		endOf: {
-			week: mockNow.endOf('week', { useLocaleWeeks: true }),
-			afterWeek: mockNow.endOf('week', { useLocaleWeeks: true }).plus({ days: 1 }).toISODate(),
-			month: mockNow.endOf('month', { useLocaleWeeks: true }),
-			afterMonth: mockNow.endOf('month', { useLocaleWeeks: true }).plus({ days: 1 }).toISODate(),
-			year: mockNow.endOf('year', { useLocaleWeeks: true }),
-			afterYear: mockNow.endOf('year', { useLocaleWeeks: true }).plus({ days: 1 }).toISODate(),
-		},
-	};
-
-	const createTodo = (overrides: Partial<Todo> = {}): Todo => ({
-		note: 'note-id',
-		note_title: 'Note Title',
-		parent_id: 'parent-id',
-		parent_title: 'Parent Title',
-		msg: 'Test task',
-		category: 'work',
-		date: '',
-		tags: [],
-		completed: false,
-		description: '',
-		scrollTo: { text: 'test', element: 'ul' },
-		key: 'test-key',
-		...overrides,
-	});
-
-	const createFilter = (overrides: Partial<Filter> = {}): Filter => ({
-		filterName: 'Test Filter',
-		note: [],
-		parent_id: [],
-		msg: [],
-		category: [],
-		date: 'All',
-		dateOverride: 'None',
-		tags: [],
-		completed: 'None',
-		...overrides,
-	});
-
-	const getFilteredKeys = (todos: Todo[], filterOverrides: Partial<Filter> = {}) => {
-		const filters: Filters = {
-			saved: [],
-			active: createFilter(filterOverrides),
-			activeHistory: [],
-			checked: {},
-		};
-		const result = calcFiltered(todos, filters);
-		return result.active.todos.map(t => t.key);
-	};
 
 	describe('date filtering', () => {
 		const { past, present, future, endOf } = dateFixtures;
