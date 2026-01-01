@@ -101,7 +101,7 @@ export default (props: Props) => {
 		const getSavedFilters = async() => {
 			const newFilters: Filters = await props.webviewApi.postMessage({ type: 'getFilters' });
 			// newFilters will be undefined on first launch, so ignore the result
-			if (!!newFilters) {
+			if (newFilters) {
 				console.info("Received new Filters:" + newFilters);
 				dispatch({
 					type: 'firstSet',

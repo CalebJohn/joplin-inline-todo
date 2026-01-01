@@ -24,7 +24,7 @@ export async function createSummaryNote() {
 
 export function insertNewSummary(old_body: string, summaryBody: string): string {
 	// Preserve the content after the hr
-	let spl = old_body.split(summary_regex);
+	const spl = old_body.split(summary_regex);
 	spl[0] = summaryBody;
 	// preserve the custom filters
 	spl[1] = summaryString(spl[1]);
@@ -51,7 +51,7 @@ export function filterSummaryCategories(body: string, summary: Summary): Summary
 	// So we'll have to hand off the parsing to an actual parser
 	const notebooks = parseNotebookNames(notebook_string);
 
-	let new_summary: SummaryMap = {};
+	const new_summary: SummaryMap = {};
 	for (const [id, todos] of Object.entries(summary.map)) {
 		const entry = todos.filter(todo => notebooks.includes(todo.parent_title));
 		if (entry.length > 0) {
@@ -63,7 +63,7 @@ export function filterSummaryCategories(body: string, summary: Summary): Summary
 }
 
 function parseNotebookNames(nbs: string): string[] {
-	let parsed = [];
+	const parsed = [];
 	let acc = '';
 	let in_quote = false;
 	for (let i = 0; i < nbs.length; i++) {

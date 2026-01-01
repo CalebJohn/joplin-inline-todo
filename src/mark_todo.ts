@@ -46,7 +46,7 @@ function parse_summary_line(line: string, summary: Summary, settings: Settings):
 	const formatTodo = summaries[settings.summary_type].format;
 
 	for (const [_, todos] of Object.entries(summary.map)) {
-		for (let todo of todos) {
+		for (const todo of todos) {
 			if (line.trim() == formatTodo(todo, settings).trim()) {
 				return todo;
 			}
@@ -67,7 +67,7 @@ async function set_origin_todo(todo: Todo, settings: Settings): Promise<boolean>
 		logger.error("Could not set the todo origin, see errors above");
 		return;
 	}
-	let lines = origin.body.split('\n');
+	const lines = origin.body.split('\n');
 	const parser = settings.todo_type;
 
 	let match: RegExpExecArray;

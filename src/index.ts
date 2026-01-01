@@ -198,7 +198,7 @@ joplin.plugins.register({
 			iconName: "fas fa-sync-alt",
 			execute: async () => {
 				await builder.search_in_all();
-				let query = '/"<!-- inline-todo-plugin"';
+				const query = '/"<!-- inline-todo-plugin"';
 				let page = 0;
 				let r;
 				do {
@@ -210,7 +210,7 @@ joplin.plugins.register({
 								return { items: [], has_more: false };
 							});
 					if (r.items) {
-						for (let note of r.items) {
+						for (const note of r.items) {
 							if (!note.is_conflict) {
 								update_summary(builder.summary, builder.settings, note.id, note.body);
 							}

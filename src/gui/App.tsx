@@ -14,7 +14,7 @@ import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: App');
 
-declare var webviewApi: WebviewApi;
+declare let webviewApi: WebviewApi;
 
 
 export default function App() {

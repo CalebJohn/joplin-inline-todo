@@ -41,7 +41,7 @@ export function SelectFilterComponent({ label, title, field, filter, dispatch, g
 		<Collapsible defaultOpen={!defaultClosed} className="group/collapsible">
 			<SidebarMenuItem>
 				<CollapsibleTrigger asChild>
-					<SidebarMenuButton title={!!title ? title : ''}>
+					<SidebarMenuButton title={title ? title : ''}>
 						<Label className="text-xs font-medium">{label}</Label>
 						<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
 					</SidebarMenuButton>

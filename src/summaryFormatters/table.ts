@@ -39,7 +39,7 @@ function formatDateForSorting(dateStr: string): string | null {
 }
 
 export async function tableBody(summary_map: SummaryMap, settings: Settings) {
-	let completed: Todo[] = [];
+	const completed: Todo[] = [];
 	let summaryBody = '| Task | category | Due | Tags | Notebook | Note |';
 	if (settings.show_complete_todo) {
 		summaryBody += ' Completed |';
@@ -55,7 +55,7 @@ export async function tableBody(summary_map: SummaryMap, settings: Settings) {
 	}
 
 	todos = todos.sort((a, b) => sortString(a, settings).localeCompare(sortString(b, settings), undefined, { sensitivity: 'accent', numeric: true }));
-	for (let todo of todos) {
+	for (const todo of todos) {
 		if (todo.completed) {
 			completed.push(todo)
 		}
@@ -65,7 +65,7 @@ export async function tableBody(summary_map: SummaryMap, settings: Settings) {
 	}
 	
 	if (completed.length > 0 && settings.show_complete_todo) {
-		for (let todo of completed) {
+		for (const todo of completed) {
 			summaryBody += formatTodo(todo, settings);
 		}
 	}

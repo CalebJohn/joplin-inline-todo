@@ -1,5 +1,5 @@
 import { Note, Settings, Todo, Filter, Summary, SummaryMap } from '../types';
-import { regexes, summaries } from '../settings_tables';
+import { regexes } from '../settings_tables';
 
 /**
  * Factory function to create a mock Note object

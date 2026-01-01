@@ -14,7 +14,7 @@ export function conferenceStyleRender(markdownIt, _options) {
     markdownIt.renderer.rules.text = function (tokens, idx, options, env, self) {
         if (tokens.length >= 3 && tokens[0].type === "checkbox_wrapper_open"
             && tokens[tokens.length - 1].type === "checkbox_wrapper_close") {
-            let result = defaultRender(tokens, idx, options, env, self);
+            const result = defaultRender(tokens, idx, options, env, self);
 
             let modifiedResult = '';
             let lastIndex = 0;
@@ -49,7 +49,7 @@ export function conferenceStyleRender(markdownIt, _options) {
                         length += 1;
                         lastIndex = i + 1;
                     }
-                    let keywords = result.substr(keywordBegin, length);
+                    const keywords = result.substr(keywordBegin, length);
                     switch (result[keywordBegin]) {
                         case '@':
                             if (keywords.length > 1) {
@@ -67,8 +67,8 @@ export function conferenceStyleRender(markdownIt, _options) {
                             break;
                         case '/':
                             if (keywords.length > 2) {
-                                let today = new Date();
-                                let duedate = new Date(keywords.substr(2));
+                                const today = new Date();
+                                const duedate = new Date(keywords.substr(2));
                                 let mod = '';
                                 if (sameDate(today, duedate)) {
                                     mod = 'due';

@@ -32,13 +32,13 @@ function sortString(todo: Todo): string {
 
 export async function diaryBody(summary_map: SummaryMap, settings: Settings) {
 	let summaryBody = '';
-	let summary: Record<string, Record<string, Todo[]>> = {};
-	let due: Todo[] = [];
-	let completed: Todo[] = [];
+	const summary: Record<string, Record<string, Todo[]>> = {};
+	const due: Todo[] = [];
+	const completed: Todo[] = [];
 
 
 	for (const [id, todos] of Object.entries(summary_map)) {
-		for (let todo of todos) {
+		for (const todo of todos) {
 			if (todo.completed) {
 				completed.push(todo)
 			}
@@ -80,7 +80,7 @@ export async function diaryBody(summary_map: SummaryMap, settings: Settings) {
 				summaryBody += `## ${folder}\n`;
 			}
 			const todos = tds.sort((a, b) => sortString(a).localeCompare(sortString(b), undefined, { sensitivity: 'accent', numeric: true }));
-			for (let todo of todos) {
+			for (const todo of todos) {
 				summaryBody += formatTodo(todo, settings) + '\n';
 			}
 		}

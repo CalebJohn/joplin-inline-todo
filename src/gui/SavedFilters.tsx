@@ -39,7 +39,7 @@ export function SavedFiltersComponent({ dispatch, filtered, filters }: Props) {
 	const switchToFilter = (item) => {
 		const savedFilter = filters.saved.find(sf => sf.filterName === item.filterName);
 
-		if (!!savedFilter) {
+		if (savedFilter) {
 			dispatch({ type: 'switchToSaved', filter: savedFilter })
 		} else {
 			logger.error("Cannot find a saved filter with name:", item.name, "this is a bug");

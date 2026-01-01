@@ -178,7 +178,7 @@ describe('table formatter', () => {
 
 			// Should still have table headers but no data rows
 			expect(result).toContain('| Task | category | Due | Tags | Notebook | Note |');
-			expect(result).toContain('| ---- | -------- | --- | ---- | -------- | ---- | --------- |');
+			expect(result).toContain('| ---- | -------- | --- | ---- | -------- | ---- |');
 		});
 
 		test('handles multiple tags correctly', async () => {

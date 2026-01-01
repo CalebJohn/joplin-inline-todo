@@ -19,13 +19,13 @@ export class SummaryBuilder {
 	async search_in_note(note: Note): Promise<boolean> {
 		// Conflict notes are duplicates usually
 		if (note.is_conflict) { return; }
-		let matches = [];
+		const matches = [];
 		// This introduces a small risk of a race condition
 		// (If this is waiting, the note.body could become stale, but this function would
 		// continue anyways and update the summary with stale data)
 		// I don't think this will be an issue in practice, and if it does crop up
 		// there won't be any data loss
-		let folder = await this.get_parent_title(note.parent_id);
+		const folder = await this.get_parent_title(note.parent_id);
 		let match;
 		const todo_type = this._settings.todo_type;
 		// Reset regex state to ensure clean scan even if previous execution was interrupted
@@ -63,7 +63,7 @@ export class SummaryBuilder {
 						return { items: [], has_more: false };
 					});
 			if (r.items) {
-				for (let note of r.items) {
+				for (const note of r.items) {
 					await this.search_in_note(note);
 				}
 			}
@@ -93,8 +93,8 @@ export class SummaryBuilder {
 	// Reads a parent title from cache, or uses the joplin api to get a title based on id
 	async get_parent_title(id: string): Promise<string> {
 		if (!(id in this._folders)) {
-			let unknown_folder = "Unknown Folder";
-			let f = await joplin.data.get(['folders', id], { fields: ['title'] })
+			const unknown_folder = "Unknown Folder";
+			const f = await joplin.data.get(['folders', id], { fields: ['title'] })
 					.catch((error) => {
 						console.error(error);
 						console.warn("Could not find folder title for id: " + id);
