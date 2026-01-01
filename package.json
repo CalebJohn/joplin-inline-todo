@@ -6,6 +6,7 @@
     "prepare": "npm run dist",
     "updateVersion": "webpack --env joplin-plugin-config=updateVersion",
     "update": "npm install -g generator-joplin && yo joplin --node-package-manager npm --update --force",
+    "preversion": "npm run test",
     "updatetags": "LOGS=$(git log $(git describe --tags --abbrev=0 HEAD~1)..HEAD~1 --oneline) && git tag -fam \"v$npm_package_version\n\n$LOGS\" v$npm_package_version && git tag -fa v$npm_package_version",
     "test": "jest",
     "postversion": "npm run updatetags && git push origin master --tags",
