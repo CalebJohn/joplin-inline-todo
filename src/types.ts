@@ -1,5 +1,3 @@
-import { DateTime, Duration } from "luxon";
-
 export interface Note {
 	id: string;
 	body: string;
