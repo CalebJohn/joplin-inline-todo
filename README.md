@@ -126,7 +126,7 @@ Todos can be filtered such that the plugin will only display Todos from specific
 <!-- inline-todo-plugin Work "Special Project" -->
 ```
 
-## Custom Editor (GUI View)
+## Custom Editor
 The plugin includes an optional custom editor that replaces the markdown summary note with an interactive GUI. This gives you a more visual way to work with your TODOs, with the ability to filter, sort, and manage tasks directly from the interface.
 
 The powerful feature of the custom editor is the **saved filters**. Instead of having a single view of all your TODOs, you can create multiple named filter views that each show a different subset of your tasks. For example, you might have:
