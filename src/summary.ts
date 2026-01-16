@@ -33,7 +33,10 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 
 	// https://github.com/laurent22/joplin/issues/5955
 	const currentNote = await joplin.workspace.selectedNote();
-	if (currentNote && currentNote.id == summary_id) {
+	// Don't immediately swap the text when the custom_editor is enabled, it's not necessary
+	// and can cause unrelated notes to be overwritten in some situations
+	// https://github.com/laurent22/joplin/issues/11721
+	if (!settings.custom_editor && currentNote && currentNote.id == summary_id) {
 		try {
 			await joplin.commands.execute('editor.setText', body);
 		} catch (error) {
