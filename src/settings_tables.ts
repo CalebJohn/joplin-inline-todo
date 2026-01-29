@@ -41,7 +41,7 @@ export const regexes = {
 	list: {
 		title: 'Metalist Style',
 		// change to find completed todo
-		regex: /(^\s*- \[[ x]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
+		regex: /(^\s*- \[[ Xx]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = todo[1].match(/(?<=\s@)([^\s]+)/);
@@ -60,7 +60,7 @@ export const regexes = {
 			let result = todo[1].split(/\s@[^\s]+/).join('');
 			result = result.split(/\s\/\/[^\s]+/).join('');
 			result = result.split(/\s\+[^\s]+/).join('');
-			result = result.split(/- \[[ |x]\]/).join('');
+			result = result.split(/- \[[ Xx]\]/).join('');
 			return result.trim();
 		},
 		description: (todo: string[]) => {
@@ -69,7 +69,7 @@ export const regexes = {
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
 		completed: (todo: string[]) => {
-			const regex = /^\s*- \[x\]\s.*$/;
+			const regex = /^\s*- \[[Xx]\]\s.*$/;
 			return regex.test(todo[1]);
 		},
 		scrollToText: (todo: string[]) => ({
@@ -97,7 +97,7 @@ export const regexes = {
 	},
 	plain: {
 		title: 'List Style',
-		regex: /(^\s*- \[[ x]\] ()()([^\n]*)$)((?:\n[^\S\n]+[-*+] (?!\[[ x]\]).+$)*)/gm,
+		regex: /(^\s*- \[[ Xx]\] ()()([^\n]*)$)((?:\n[^\S\n]+[-*+] (?!\[[ x]\]).+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = regexes.list.category(todo);
@@ -118,7 +118,7 @@ export const regexes = {
 		toggle: { open: '- [ ]', closed: '- [x]' },
 		completed_query: '/"- [x]"',
 		completed: (todo: string[]) => {
-			const regex = /^\s*- \[x\]\s.*$/;
+			const regex = /^\s*- \[[Xx]\]\s.*$/;
 			return regex.test(todo[1]);
 		},
 		scrollToText: (todo: string[]) => ({

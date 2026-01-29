@@ -64,6 +64,15 @@ describe('regexes', () => {
 				expect(listRegex.completed(matches[0])).toBe(false);
 			});
 
+			test('matches completed todo with uppercase X', () => {
+				const text = '- [X] Done task @work';
+				const matches = Array.from(text.matchAll(listRegex.regex));
+				expect(matches).toHaveLength(1);
+				expect(listRegex.msg(matches[0])).toBe('Done task');
+				expect(listRegex.category(matches[0])).toBe('work');
+				expect(listRegex.completed(matches[0])).toBe(true);
+			});
+
 			test('matches indented todo', () => {
 				const text = '  - [ ] Indented task @work';
 				const matches = Array.from(text.matchAll(listRegex.regex));
@@ -250,6 +259,14 @@ describe('regexes', () => {
 				expect(matches).toHaveLength(1);
 				expect(plainRegex.msg(matches[0])).toBe('Completed task');
 				expect(plainRegex.category(matches[0])).toBe('Unassigned');
+				expect(plainRegex.completed(matches[0])).toBe(true);
+			});
+
+			test('matches completed checkbox with uppercase X', () => {
+				const text = '- [X] Completed task';
+				const matches = Array.from(text.matchAll(plainRegex.regex));
+				expect(matches).toHaveLength(1);
+				expect(plainRegex.msg(matches[0])).toBe('Completed task');
 				expect(plainRegex.completed(matches[0])).toBe(true);
 			});
 
