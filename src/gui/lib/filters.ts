@@ -1,4 +1,5 @@
 import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo } from "../../types";
+import { localDateTime } from "./dateUtils";
 import { DateTime, Duration } from "luxon";
 import Logger from "@joplin/utils/Logger";
 
@@ -34,7 +35,7 @@ function durationFromFilter(s: DateFilter): Duration {
 
 function filterSingleDate(todo: Todo, duration: Duration, now: DateTime): boolean {
 	if (!todo.date) { return false; }
-	const dueDate = DateTime.fromISO(todo.date);
+	const dueDate = localDateTime(todo.date);
 
 	// Check if the date is valid
 	if (!dueDate.isValid) { return false; }
@@ -92,7 +93,7 @@ function completionShortcut(todo: Todo, filter: CompletedFilter, checked: Checke
 	// and can't be shown
 	if (!checked.hasOwnProperty(todo.key)) { return false; }
 
-	const checkDate = DateTime.fromISO(checked[todo.key]);
+	const checkDate = localDateTime(checked[todo.key]);
 
 	if (filter === "Today") {
 		return now.toISODate() === checked[todo.key];

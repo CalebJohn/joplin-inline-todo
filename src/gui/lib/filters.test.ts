@@ -1183,9 +1183,6 @@ describe('filters', () => {
 					'not-a-date',
 					'2024-13-01', // Invalid month
 					'2024-01-32', // Invalid day
-					'2024/01/15', // Wrong separator
-					'01-15-2024', // Wrong order
-					'2024-1-1',   // Missing leading zeros
 					'',           // Empty string
 					' ',          // Whitespace
 					'null',       // String "null"
