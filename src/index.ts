@@ -27,6 +27,7 @@ async function getSettings(): Promise<Settings> {
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
 		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
 		custom_editor: await joplin.settings.value('enableCustomEditor'),
+		linearApiKey: await joplin.settings.value('linearApiKey'),
 	};
 }
 
@@ -127,6 +128,15 @@ joplin.plugins.register({
 				section: 'settings.calebjohn.todo',
 				public: true,
 				label: 'Enable custom editor for summary notes',
+			},
+			'linearApiKey': {
+				value: '',
+				type: SettingItemType.String,
+				section: 'settings.calebjohn.todo',
+				public: true,
+				secure: true,
+				label: 'Linear API Key (leave empty to disable)',
+				description: 'Personal API key from Linear Settings > API. When set, Linear issues assigned to you will appear in the custom editor.',
 			},
 		});
 

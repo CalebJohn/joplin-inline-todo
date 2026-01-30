@@ -2,15 +2,34 @@ import joplin from 'api';
 import { ModelType } from 'api/types';
 import { SummaryBuilder } from './builder';
 import { isSummary } from './summary_note';
-import { Filters, IpcMessage, Todo } from './types';
+import { Filters, IpcMessage, Todo, ExternalTodo, isExternalTodo } from './types';
 import { mark_done_scrollto } from './mark_todo';
+import { ExternalSourceManager } from './external/ExternalSourceManager';
+import { LinearSource } from './external/linear/LinearSource';
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: registerEditor');
 
+let externalManager: ExternalSourceManager | null = null;
+
+export function getExternalManager(): ExternalSourceManager | null {
+	return externalManager;
+}
+
 export async function registerEditor(builder: SummaryBuilder) {
 	const versionInfo = await joplin.versionInfo();
 	const editors = joplin.views.editors;
+
+	// Initialize external source manager
+	externalManager = new ExternalSourceManager(builder.settings);
+	externalManager.registerSource(new LinearSource(builder.settings));
+
+	// Update external manager when settings change
+	joplin.settings.onChange(async () => {
+		if (externalManager) {
+			externalManager.updateSettings(builder.settings);
+		}
+	});
 
 	editors.register("todo-editor", {
 		async onSetup(view) {
@@ -35,10 +54,31 @@ export async function registerEditor(builder: SummaryBuilder) {
 					await builder.search_in_all();
 					return builder.summary;
 				}
+				else if (message.type === 'getExternalTodos') {
+					if (!externalManager) {
+						return {};
+					}
+					return await externalManager.fetchAllTodos();
+				}
 				else if (message.type === 'markDone') {
-					const todo = message.value as Todo;
-					await mark_done_scrollto(todo);
+					const todo = message.value as Todo | ExternalTodo;
 
+					// Handle external todos differently
+					if (isExternalTodo(todo)) {
+						if (!externalManager) {
+							return false;
+						}
+						const success = await externalManager.markDone(todo);
+						if (success) {
+							// Fetch updated external todos and push to UI
+							const externalState = await externalManager.fetchAllTodos();
+							editors.postMessage(view, { type: 'updateExternalTodos', value: externalState });
+						}
+						return success;
+					}
+
+					// Handle local todos as before
+					await mark_done_scrollto(todo);
 					await builder.search_in_all();
 					editors.postMessage(view, { type: 'updateSummary', value: builder.summary });
 

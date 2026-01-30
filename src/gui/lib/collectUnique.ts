@@ -1,6 +1,6 @@
-import { Todo, UniqueFields } from "../../types";
+import { AnyTodo, UniqueFields } from "../../types";
 
-export default function collectUnique(summary: Todo[]): UniqueFields {
+export default function collectUnique(summary: AnyTodo[]): UniqueFields {
 	const note = new Set<string>();
 	const parent_id = new Set<string>();
 	const category = new Set<string>();

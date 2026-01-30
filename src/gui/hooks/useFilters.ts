@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useEffect, useReducer } from "react";
-import { Checked, Filter, Filtered, Filters, Todo, WebviewApi } from "../../types";
+import { Checked, Filter, Filtered, Filters, Todo, WebviewApi, AnyTodo } from "../../types";
 import { DateTime } from "luxon";
 import Logger from "@joplin/utils/Logger";
 
@@ -8,7 +8,7 @@ const logger = Logger.create('inline-todo: useFilters');
 
 interface Props {
 	webviewApi: WebviewApi;
-	summary: Todo[];
+	summary: AnyTodo[];
 }
 
 const emptyFilter = {
@@ -86,7 +86,7 @@ function filterReducer(filters, action): Filters {
 
 // On first load we need to ensure that our cached checked state is inline
 // with any changes that might have happened outside this app
-function syncChecked(checked: Checked, summary: Todo[]): Checked {
+function syncChecked(checked: Checked, summary: AnyTodo[]): Checked {
 	const notCompleted = new Set(
 		summary
 			.filter(todo => !todo.completed)

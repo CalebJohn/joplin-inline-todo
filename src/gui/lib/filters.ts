@@ -1,4 +1,4 @@
-import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo } from "../../types";
+import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo, AnyTodo } from "../../types";
 import { localDateTime } from "./dateUtils";
 import { DateTime, Duration } from "luxon";
 import Logger from "@joplin/utils/Logger";
@@ -161,12 +161,14 @@ function sortTodos(active: ActiveFiltered): ActiveFiltered {
 	return {...active, todos: todos};
 }
 
-export default function calcFiltered(summary: Todo[], filters: Filters): Filtered {
+export default function calcFiltered(summary: AnyTodo[], filters: Filters): Filtered {
+	// AnyTodo extends Todo so we can safely cast
+	const todos = summary as Todo[];
 	const saved = filters.saved.map((sf) => ({
 		filterName: sf.filterName,
-		openCount: calcSingleFilter(summary, sf, filters.checked).openCount
+		openCount: calcSingleFilter(todos, sf, filters.checked).openCount
 	}));
-	const active = sortTodos(calcSingleFilter(summary, filters.active, filters.checked));
+	const active = sortTodos(calcSingleFilter(todos, filters.active, filters.checked));
 
 	return { saved, active };
 }

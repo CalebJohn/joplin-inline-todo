@@ -10,6 +10,7 @@ import { FilterSidebar } from "./Sidebar"
 import { RefreshButton } from "./RefreshButton";
 import { Separator } from "@/src/gui/components/ui/separator"
 import { SidebarProvider, SidebarTrigger } from "@/src/gui/components/ui/sidebar"
+import { Loader2, AlertCircle } from "lucide-react";
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: App');
@@ -18,21 +19,27 @@ declare let webviewApi: WebviewApi;
 
 
 export default function App() {
-	const {summary, settings, refreshSummary} = usePluginData({ webviewApi });
+	const {
+		allTodos,
+		externalLoading,
+		externalError,
+		settings,
+		refreshAll
+	} = usePluginData({ webviewApi });
 
-	const [filters, dispatch] = useFilters({ webviewApi, summary });
+	const [filters, dispatch] = useFilters({ webviewApi, summary: allTodos });
 
 	const isMobile = useIsMobile();
 
-	const filtered = React.useMemo(() => calcFiltered(summary, filters), [summary, filters]);
-	const uniqueFields = React.useMemo(() => collectUnique(summary), [summary]);
+	const filtered = React.useMemo(() => calcFiltered(allTodos, filters), [allTodos, filters]);
+	const uniqueFields = React.useMemo(() => collectUnique(allTodos), [allTodos]);
 
 	const sidebarProps = {
 		filters,
 		dispatch,
 		filtered,
 		uniqueFields,
-		todos: summary,
+		todos: allTodos,
 	};
 
 	// The parent container has a 10px border, so we need to subtract 20px from the width
@@ -47,8 +54,25 @@ export default function App() {
 						orientation="vertical"
 						className="mr-2 data-[orientation=vertical]:h-4"
 					/>
+
+					{/* Loading indicator for external sources */}
+					{externalLoading && (
+						<span className="flex items-center gap-1 text-xs text-muted-foreground">
+							<Loader2 className="size-3 animate-spin" />
+							Loading external...
+						</span>
+					)}
+
+					{/* Error indicator */}
+					{externalError && (
+						<span className="flex items-center gap-1 text-xs text-destructive" title={externalError}>
+							<AlertCircle className="size-3" />
+							Error
+						</span>
+					)}
+
 					<div className="flex ml-auto px-3 items-center gap-2">
-						<RefreshButton {...{refreshSummary}} />
+						<RefreshButton refreshSummary={refreshAll} />
 					</div>
 				</header>
 				<div className="flex p-2 flex-col flex-1 overflow-y-scroll">

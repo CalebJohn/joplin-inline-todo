@@ -30,6 +30,28 @@ export interface Todo {
 	key?: string;
 }
 
+export interface ExternalTodo extends Todo {
+	source: string;
+	externalId: string;
+	externalUrl?: string;
+	externalState?: string;
+}
+
+export type AnyTodo = Todo | ExternalTodo;
+
+export function isExternalTodo(todo: AnyTodo): todo is ExternalTodo {
+	return 'source' in todo && (todo as ExternalTodo).source !== undefined;
+}
+
+export interface ExternalFetchResult {
+	source: string;
+	todos: ExternalTodo[];
+	error?: string;
+	timestamp: Date;
+}
+
+export type ExternalSourcesState = Record<string, ExternalFetchResult>;
+
 interface Toggle {
 	open: string;
 	closed: string;
@@ -61,6 +83,7 @@ export interface Settings {
 	show_complete_todo: boolean;
 	auto_refresh_summary: boolean;
 	custom_editor: boolean;
+	linearApiKey?: string;
 }
 
 export interface TitleEntry {
@@ -138,7 +161,9 @@ export type IpcMessageType =
 	'updateSummary' |
 	'markDone' |
 	'jumpTo' |
-	'shouldUseDarkColors';
+	'shouldUseDarkColors' |
+	'getExternalTodos' |
+	'updateExternalTodos';
 
 export interface IpcMessage {
 	type: IpcMessageType;
