@@ -41,7 +41,10 @@ export const regexes = {
 	list: {
 		title: 'Metalist Style',
 		// change to find completed todo
-		regex: /(^\s*- \[[ Xx]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
+		regex: /(^\s*- \[[ Xx]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)/gm,
+		// Temporarily disable description fetching so that uses can have sub-issues
+		// restore this once official sub-issue support is added
+		// regex: /(^\s*- \[[ Xx]\]\s.*(?<=\s)(?:(@[^\s]+)|(\/\/[^\s]+)|(\+[^\s]+))(?:[^\n]*)?$)((?:\n[^\S\n]+.+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = todo[1].match(/(?<=\s@)([^\s]+)/);
@@ -97,7 +100,9 @@ export const regexes = {
 	},
 	plain: {
 		title: 'List Style',
-		regex: /(^\s*- \[[ Xx]\] ()()([^\n]*)$)((?:\n[^\S\n]+[-*+] (?!\[[ x]\]).+$)*)/gm,
+		regex: /(^\s*- \[[ Xx]\] ()()([^\n]*)$)/gm,
+		// See note in the metalist regex
+		// regex: /(^\s*- \[[ Xx]\] ()()([^\n]*)$)((?:\n[^\S\n]+[-*+] (?!\[[ x]\]).+$)*)/gm,
 		query: '/"- [ ]"',
 		category: (todo: string[]) => {
 			const result = regexes.list.category(todo);

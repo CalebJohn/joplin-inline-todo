@@ -91,8 +91,9 @@ describe('regexes', () => {
 				expect(matches).toHaveLength(1);
 				expect(listRegex.msg(matches[0])).toBe('Task with description');
 				expect(listRegex.category(matches[0])).toBe('work');
-				expect(listRegex.description(matches[0])).toContain('Additional info line 1');
-				expect(listRegex.description(matches[0])).toContain('Additional info line 2');
+				// Description field is disabled until official sub-task support is added
+				// expect(listRegex.description(matches[0])).toContain('Additional info line 1');
+				// expect(listRegex.description(matches[0])).toContain('Additional info line 2');
 			});
 
 			test('does not match todo without category, date, or tags', () => {
@@ -285,11 +286,13 @@ describe('regexes', () => {
     + Sub-item 3`;
 				const matches = Array.from(text.matchAll(plainRegex.regex));
 				expect(matches).toHaveLength(1);
-				expect(matches[0][5]).toContain('Sub-item 1');
-				expect(matches[0][5]).toContain('Sub-item 2');
+				// Description field is disabled until official sub-task support is added
+				// expect(matches[0][5]).toContain('Sub-item 1');
+				// expect(matches[0][5]).toContain('Sub-item 2');
 				expect(plainRegex.msg(matches[0])).toBe('Task with description');
-				expect(plainRegex.description(matches[0])).toContain('Sub-item 1');
-				expect(plainRegex.description(matches[0])).toContain('Sub-item 2');
+				// Description field is disabled until official sub-task support is added
+				// expect(plainRegex.description(matches[0])).toContain('Sub-item 1');
+				// expect(plainRegex.description(matches[0])).toContain('Sub-item 2');
 			});
 
 			test('does not match description with nested checkboxes', () => {
@@ -341,6 +344,117 @@ describe('regexes', () => {
 					element: 'ul'
 				});
 			});
+		});
+	});
+
+	describe('nested todos (Metalist Style)', () => {
+		const listRegex = regexes.list;
+
+		test('matches parent and nested todo independently', () => {
+			const text = `- [ ] Parent task @work
+  - [ ] Child task @home`;
+			const matches = Array.from(text.matchAll(listRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(listRegex.msg(matches[0])).toBe('Parent task');
+			expect(listRegex.category(matches[0])).toBe('work');
+			expect(listRegex.msg(matches[1])).toBe('Child task');
+			expect(listRegex.category(matches[1])).toBe('home');
+		});
+
+		test('matches deeply nested todos', () => {
+			const text = `- [ ] Level 1 @work
+  - [ ] Level 2 @home
+    - [ ] Level 3 @personal`;
+			const matches = Array.from(text.matchAll(listRegex.regex));
+			expect(matches).toHaveLength(3);
+			expect(listRegex.msg(matches[2])).toBe('Level 3');
+			expect(listRegex.category(matches[2])).toBe('personal');
+		});
+
+		test('nested completed and uncompleted todos', () => {
+			const text = `- [ ] Parent @work
+  - [x] Completed child @work
+  - [ ] Incomplete child @work`;
+			const matches = Array.from(text.matchAll(listRegex.regex));
+			expect(matches).toHaveLength(3);
+			expect(listRegex.completed(matches[0])).toBe(false);
+			expect(listRegex.completed(matches[1])).toBe(true);
+			expect(listRegex.completed(matches[2])).toBe(false);
+		});
+
+		test('nested todos with different metadata', () => {
+			const text = `- [ ] Parent @work //2024-01-15 +urgent
+  - [ ] Child @home //2024-02-01 +low`;
+			const matches = Array.from(text.matchAll(listRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(listRegex.date(matches[0])).toBe('2024-01-15');
+			expect(listRegex.tags(matches[0])).toEqual(['urgent']);
+			expect(listRegex.date(matches[1])).toBe('2024-02-01');
+			expect(listRegex.tags(matches[1])).toEqual(['low']);
+		});
+
+		test('nested plain items do not match as todos', () => {
+			const text = `- [ ] Parent @work
+  - Plain child item
+  - [ ] Todo child @home`;
+			const matches = Array.from(text.matchAll(listRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(listRegex.msg(matches[0])).toBe('Parent');
+			expect(listRegex.msg(matches[1])).toBe('Todo child');
+		});
+	});
+
+	describe('nested todos (List Style)', () => {
+		const plainRegex = regexes.plain;
+
+		test('matches parent and nested todo independently', () => {
+			const text = `- [ ] Parent task
+  - [ ] Child task`;
+			const matches = Array.from(text.matchAll(plainRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(plainRegex.msg(matches[0])).toBe('Parent task');
+			expect(plainRegex.msg(matches[1])).toBe('Child task');
+		});
+
+		test('matches deeply nested todos', () => {
+			const text = `- [ ] Level 1
+  - [ ] Level 2
+    - [ ] Level 3`;
+			const matches = Array.from(text.matchAll(plainRegex.regex));
+			expect(matches).toHaveLength(3);
+			expect(plainRegex.msg(matches[2])).toBe('Level 3');
+		});
+
+		test('nested completed and uncompleted todos', () => {
+			const text = `- [ ] Parent
+  - [x] Completed child
+  - [ ] Incomplete child`;
+			const matches = Array.from(text.matchAll(plainRegex.regex));
+			expect(matches).toHaveLength(3);
+			expect(plainRegex.completed(matches[0])).toBe(false);
+			expect(plainRegex.completed(matches[1])).toBe(true);
+			expect(plainRegex.completed(matches[2])).toBe(false);
+		});
+
+		test('nested todos with metadata', () => {
+			const text = `- [ ] Parent @work
+  - [ ] Child @home //2024-01-15 +urgent`;
+			const matches = Array.from(text.matchAll(plainRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(plainRegex.category(matches[0])).toBe('work');
+			expect(plainRegex.category(matches[1])).toBe('home');
+			expect(plainRegex.date(matches[1])).toBe('2024-01-15');
+			expect(plainRegex.tags(matches[1])).toEqual(['urgent']);
+		});
+
+		test('nested non-checkbox items are not matched', () => {
+			const text = `- [ ] Parent task
+  - Regular item
+  - [ ] Child task`;
+			const matches = Array.from(text.matchAll(plainRegex.regex));
+			expect(matches).toHaveLength(2);
+			expect(plainRegex.msg(matches[0])).toBe('Parent task');
+			expect(plainRegex.msg(matches[1])).toBe('Child task');
 		});
 	});
 
