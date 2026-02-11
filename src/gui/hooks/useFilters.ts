@@ -41,8 +41,14 @@ function filterReducer(filters, action): Filters {
 		}
 		case 'saveActive': {
 			const newFilter = { ...filters.active, filterName: action.name };
-			// If a filter with a name already exists, overwrite it
-			const newSaved = [...filters.saved.filter((f) => f.filterName !== action.name), newFilter];
+			const existingIndex = filters.saved.findIndex((f) => f.filterName === action.name);
+			let newSaved;
+			if (existingIndex >= 0) {
+				// Update in place to preserve order
+				newSaved = filters.saved.map((f, i) => i === existingIndex ? newFilter : f);
+			} else {
+				newSaved = [...filters.saved, newFilter];
+			}
 			return { ...filters, active: newFilter, saved: newSaved };
 		}
 		case 'switchToSaved': {
