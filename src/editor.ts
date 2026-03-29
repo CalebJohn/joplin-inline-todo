@@ -4,8 +4,8 @@ import { SummaryBuilder } from './builder';
 import { isSummary } from './summary_note';
 import { Filters, IpcMessage, Todo, ExternalTodo, isExternalTodo } from './types';
 import { mark_done_scrollto } from './mark_todo';
+import { createExternalManager } from './external';
 import { ExternalSourceManager } from './external/ExternalSourceManager';
-import { LinearSource } from './external/linear/LinearSource';
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: registerEditor');
@@ -21,15 +21,7 @@ export async function registerEditor(builder: SummaryBuilder) {
 	const editors = joplin.views.editors;
 
 	// Initialize external source manager
-	externalManager = new ExternalSourceManager(builder.settings);
-	externalManager.registerSource(new LinearSource(builder.settings));
-
-	// Update external manager when settings change
-	joplin.settings.onChange(async () => {
-		if (externalManager) {
-			externalManager.updateSettings(builder.settings);
-		}
-	});
+	externalManager = createExternalManager(builder.settings);
 
 	editors.register("todo-editor", {
 		async onSetup(view) {
@@ -68,12 +60,9 @@ export async function registerEditor(builder: SummaryBuilder) {
 						if (!externalManager) {
 							return false;
 						}
+						// Optimistic update: push the updated item to UI immediately
+						editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: true } });
 						const success = await externalManager.markDone(todo);
-						if (success) {
-							// Fetch updated external todos and push to UI
-							const externalState = await externalManager.fetchAllTodos();
-							editors.postMessage(view, { type: 'updateExternalTodos', value: externalState });
-						}
 						return success;
 					}
 

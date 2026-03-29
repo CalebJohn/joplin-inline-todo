@@ -35,6 +35,7 @@ export interface ExternalTodo extends Todo {
 	externalId: string;
 	externalUrl?: string;
 	externalState?: string;
+	icon?: string;
 }
 
 export type AnyTodo = Todo | ExternalTodo;
@@ -72,6 +73,12 @@ interface RegexEntry {
 	scrollToText: (s: string[]) => object; // joplin ScrollToTextValue
 }
 
+export interface ExternalSourcesConfig {
+	linear?: {
+		apiKey?: string;
+	};
+}
+
 export interface Settings {
 	summary_id?: string;
 	scan_period_s: number;
@@ -83,7 +90,7 @@ export interface Settings {
 	show_complete_todo: boolean;
 	auto_refresh_summary: boolean;
 	custom_editor: boolean;
-	linearApiKey?: string;
+	externalSources?: ExternalSourcesConfig;
 }
 
 export interface TitleEntry {
@@ -163,7 +170,8 @@ export type IpcMessageType =
 	'jumpTo' |
 	'shouldUseDarkColors' |
 	'getExternalTodos' |
-	'updateExternalTodos';
+	'updateExternalTodos' |
+	'updateExternalTodoItem';
 
 export interface IpcMessage {
 	type: IpcMessageType;

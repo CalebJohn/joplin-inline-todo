@@ -23,6 +23,8 @@ export default function App() {
 		allTodos,
 		externalLoading,
 		externalError,
+		summaryLoading,
+		summaryError,
 		settings,
 		refreshAll
 	} = usePluginData({ webviewApi });
@@ -55,19 +57,25 @@ export default function App() {
 						className="mr-2 data-[orientation=vertical]:h-4"
 					/>
 
-					{/* Loading indicator for external sources */}
-					{externalLoading && (
+					{/* Loading indicators */}
+					{(summaryLoading || externalLoading) && (
 						<span className="flex items-center gap-1 text-xs text-muted-foreground">
 							<Loader2 className="size-3 animate-spin" />
-							Loading external...
+							{summaryLoading && externalLoading ? 'Loading...' : summaryLoading ? 'Loading summary...' : 'Loading external...'}
 						</span>
 					)}
 
-					{/* Error indicator */}
+					{/* Error indicators */}
+					{summaryError && (
+						<span className="flex items-center gap-1 text-xs text-destructive" title={summaryError}>
+							<AlertCircle className="size-3" />
+							Summary error
+						</span>
+					)}
 					{externalError && (
 						<span className="flex items-center gap-1 text-xs text-destructive" title={externalError}>
 							<AlertCircle className="size-3" />
-							Error
+							External error
 						</span>
 					)}
 

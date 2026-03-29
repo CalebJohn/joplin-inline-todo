@@ -22,6 +22,8 @@ export default (props: Props) => {
 	const [externalTodos, setExternalTodos] = useState<ExternalTodo[]>([]);
 	const [externalLoading, setExternalLoading] = useState(false);
 	const [externalError, setExternalError] = useState<string | null>(null);
+	const [summaryLoading, setSummaryLoading] = useState(false);
+	const [summaryError, setSummaryError] = useState<string | null>(null);
 	const [settings, setSettings] = useState<Settings>(null);
 
 	// Combine local and external todos
@@ -31,10 +33,19 @@ export default (props: Props) => {
 
 	const refreshSummary = () => {
 		const fn = async() => {
-			const newSummary: Summary = await props.webviewApi.postMessage({ type: 'getSummary' });
-			// Flatten Summary map to a list of todos
-			const flatSummary = Object.values(newSummary.map).flat();
-			setSummary(flatSummary.map(addStableKey));
+			setSummaryLoading(true);
+			setSummaryError(null);
+			try {
+				const newSummary: Summary = await props.webviewApi.postMessage({ type: 'getSummary' });
+				// Flatten Summary map to a list of todos
+				const flatSummary = Object.values(newSummary.map).flat();
+				setSummary(flatSummary.map(addStableKey));
+			} catch (error) {
+				logger.error('Failed to fetch summary:', error);
+				setSummaryError('Failed to fetch summary');
+			} finally {
+				setSummaryLoading(false);
+			}
 		}
 		void fn();
 	}
@@ -117,6 +128,9 @@ export default (props: Props) => {
 					allExternal.push(...result.todos);
 				}
 				setExternalTodos(allExternal);
+			} else if (message.type === 'updateExternalTodoItem') {
+				const updated = message.value as ExternalTodo;
+				setExternalTodos(prev => prev.map(t => t.externalId === updated.externalId ? updated : t));
 			} else {
 				logger.warn('Unknown message:' + JSON.stringify(message));
 			}
@@ -129,6 +143,8 @@ export default (props: Props) => {
 		externalTodos,     // External only
 		externalLoading,
 		externalError,
+		summaryLoading,
+		summaryError,
 		settings,
 		refreshSummary,
 		refreshExternalTodos,

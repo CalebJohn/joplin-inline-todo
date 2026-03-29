@@ -7,7 +7,7 @@ import { update_summary } from './summary';
 import { mark_current_line_as_done } from './mark_todo';
 import { regexes, regexTitles, summaryTitles } from './settings_tables';
 import { createSummaryNote, isSummary } from './summary_note';
-import { registerEditor } from './editor';
+import { registerEditor, getExternalManager } from './editor';
 
 const globalLogger = new Logger();
 globalLogger.addTarget(TargetType.Console);
@@ -27,7 +27,11 @@ async function getSettings(): Promise<Settings> {
 		show_complete_todo: await joplin.settings.value('showCompletetodoitems'),
 		auto_refresh_summary: await joplin.settings.value('autoRefreshSummary'),
 		custom_editor: await joplin.settings.value('enableCustomEditor'),
-		linearApiKey: await joplin.settings.value('linearApiKey'),
+		externalSources: {
+			linear: {
+				apiKey: await joplin.settings.value('linearApiKey'),
+			},
+		},
 	};
 }
 
@@ -241,6 +245,7 @@ joplin.plugins.register({
 
 		await joplin.settings.onChange(async (_) => {
 			builder.settings = await getSettings();
+			getExternalManager()?.updateSettings(builder.settings);
 		});
 
 		await joplin.workspace.onNoteSelectionChange(async () => {

@@ -10,6 +10,7 @@ export abstract class BaseExternalSource implements ExternalSource {
 	protected cacheExpiry?: Date;
 	protected cacheDurationMs: number;
 	protected _settings: Settings;
+	private refreshInProgress: boolean = false;
 
 	abstract readonly sourceId: string;
 	abstract readonly displayName: string;
@@ -42,16 +43,29 @@ export abstract class BaseExternalSource implements ExternalSource {
 			};
 		}
 
-		// Check cache validity
-		if (this.cachedResult && this.cacheExpiry && new Date() < this.cacheExpiry) {
+		const cacheValid = this.cachedResult && this.cacheExpiry && new Date() < this.cacheExpiry;
+
+		// Return cached result if still valid
+		if (cacheValid) {
 			this.logger?.info('Returning cached result');
 			return this.cachedResult;
 		}
 
+		// Cache expired but we have stale data — return it and refresh in the background
+		if (this.cachedResult && !this.refreshInProgress) {
+			this.logger?.info('Returning stale cache, refreshing in background');
+			this.refreshInBackground();
+			return this.cachedResult;
+		}
+
+		// No cached data at all — must fetch synchronously
+		return this.fetchAndCache();
+	}
+
+	private async fetchAndCache(): Promise<ExternalFetchResult> {
 		try {
 			const result = await this.fetchTodosInternal();
 
-			// Cache successful results
 			if (!result.error) {
 				this.cachedResult = result;
 				this.cacheExpiry = new Date(Date.now() + this.cacheDurationMs);
@@ -67,6 +81,13 @@ export abstract class BaseExternalSource implements ExternalSource {
 				timestamp: new Date(),
 			};
 		}
+	}
+
+	private refreshInBackground(): void {
+		this.refreshInProgress = true;
+		this.fetchAndCache().finally(() => {
+			this.refreshInProgress = false;
+		});
 	}
 
 	async markDone(todo: ExternalTodo): Promise<boolean> {
