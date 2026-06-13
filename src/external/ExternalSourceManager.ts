@@ -41,7 +41,7 @@ export class ExternalSourceManager {
 		return Array.from(this.sources.values()).filter(s => s.isEnabled());
 	}
 
-	async fetchAllTodos(): Promise<ExternalSourcesState> {
+	async fetchAllTodos(forceFresh: boolean = false): Promise<ExternalSourcesState> {
 		const enabledSources = this.getEnabledSources();
 
 		if (enabledSources.length === 0) {
@@ -49,7 +49,7 @@ export class ExternalSourceManager {
 		}
 
 		const results = await Promise.all(
-			enabledSources.map(source => source.fetchTodos())
+			enabledSources.map(source => source.fetchTodos(forceFresh))
 		);
 
 		const state: ExternalSourcesState = {};

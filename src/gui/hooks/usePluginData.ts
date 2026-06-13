@@ -50,14 +50,15 @@ export default (props: Props) => {
 		void fn();
 	}
 
-	const refreshExternalTodos = () => {
+	const refreshExternalTodos = (forceFresh: boolean = false) => {
 		const fn = async () => {
 			setExternalLoading(true);
 			setExternalError(null);
 
 			try {
 				const externalState: ExternalSourcesState = await props.webviewApi.postMessage({
-					type: 'getExternalTodos'
+					type: 'getExternalTodos',
+					value: { forceFresh }
 				});
 
 				// Flatten all external todos from all sources
@@ -87,9 +88,9 @@ export default (props: Props) => {
 		void fn();
 	};
 
-	const refreshAll = () => {
+	const refreshAll = (forceFresh: boolean = false) => {
 		refreshSummary();
-		refreshExternalTodos();
+		refreshExternalTodos(forceFresh);
 	};
 
 	useEffect(() => {

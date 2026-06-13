@@ -36,13 +36,19 @@ export abstract class BaseExternalSource implements ExternalSource {
 		this._settings = settings;
 	}
 
-	async fetchTodos(): Promise<ExternalFetchResult> {
+	async fetchTodos(forceFresh: boolean = false): Promise<ExternalFetchResult> {
 		if (!this.isEnabled()) {
 			return {
 				source: this.sourceId,
 				todos: [],
 				timestamp: new Date(),
 			};
+		}
+
+		// Manual refresh bypasses the cache so the user sees changes made in the source app immediately.
+		if (forceFresh) {
+			this.logger?.info('Force-fresh fetch, bypassing cache');
+			return this.fetchAndCache();
 		}
 
 		const cacheValid = this.cachedResult && this.cacheExpiry && new Date() < this.cacheExpiry;

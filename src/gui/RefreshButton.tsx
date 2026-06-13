@@ -4,7 +4,7 @@ import { Button } from "@/src/gui/components/ui/button"
 import { RefreshCw } from "lucide-react";
 
 interface Props {
-	refreshSummary: () => void;
+	refreshSummary: (forceFresh?: boolean) => void;
 }
 
 
@@ -13,7 +13,7 @@ export function RefreshButton({ refreshSummary }: Props) {
 
   const handleClick = () => {
     setRotation(prev => prev + 180);
-		refreshSummary();
+		refreshSummary(true);
   };
 
 	return (

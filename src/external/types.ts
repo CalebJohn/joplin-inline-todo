@@ -10,7 +10,7 @@ export interface ExternalSource {
 	readonly displayName: string;
 
 	isEnabled(): boolean;
-	fetchTodos(): Promise<ExternalFetchResult>;
+	fetchTodos(forceFresh?: boolean): Promise<ExternalFetchResult>;
 	markDone(todo: ExternalTodo): Promise<boolean>;
 	getConfig(): ExternalSourceConfig;
 	updateSettings(settings: Settings): void;

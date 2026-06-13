@@ -62,7 +62,8 @@ export async function registerEditor(builder: SummaryBuilder) {
 					if (!externalManager) {
 						return {};
 					}
-					return await externalManager.fetchAllTodos();
+					const forceFresh = message.value?.forceFresh === true;
+					return await externalManager.fetchAllTodos(forceFresh);
 				}
 				else if (message.type === 'markDone') {
 					const todo = message.value as Todo | ExternalTodo;
