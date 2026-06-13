@@ -7,6 +7,7 @@ const logger = Logger.create('inline-todo: ExternalSourceManager');
 export class ExternalSourceManager {
 	private sources: Map<string, ExternalSource> = new Map();
 	private _settings: Settings;
+	private refreshCallback?: (state: ExternalSourcesState) => void;
 
 	constructor(settings: Settings) {
 		this._settings = settings;
@@ -14,6 +15,18 @@ export class ExternalSourceManager {
 
 	registerSource(source: ExternalSource): void {
 		this.sources.set(source.sourceId, source);
+		// When a source's background refresh completes, dispatch the latest aggregate state.
+		// fetchAllTodos returns instantly here since every source's cache is now fresh.
+		source.setRefreshCallback(async () => {
+			if (this.refreshCallback) {
+				const state = await this.fetchAllTodos();
+				this.refreshCallback(state);
+			}
+		});
+	}
+
+	setRefreshCallback(callback: (state: ExternalSourcesState) => void): void {
+		this.refreshCallback = callback;
 	}
 
 	updateSettings(settings: Settings): void {

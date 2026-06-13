@@ -23,8 +23,18 @@ export async function registerEditor(builder: SummaryBuilder) {
 	// Initialize external source manager
 	externalManager = createExternalManager(builder.settings);
 
+	// Track the active editor view so background refreshes can push fresh data to the UI.
+	// Joplin typically has one active summary editor at a time; the latest onSetup wins.
+	let activeView: any = null;
+	externalManager.setRefreshCallback((state) => {
+		if (activeView) {
+			editors.postMessage(activeView, { type: 'updateExternalTodos', value: state });
+		}
+	});
+
 	editors.register("todo-editor", {
 		async onSetup(view) {
+			activeView = view;
 			await editors.setHtml(view, `<div id="root" class="platform-${versionInfo.platform}"></div>`);
 			await editors.addScript(view, './panel.js');
 			await editors.addScript(view, './gui/style/output.css');
@@ -40,7 +50,9 @@ export async function registerEditor(builder: SummaryBuilder) {
 				logger.info('PostMessagePlugin (Webview): Got message from webview:', message);
 
 				if (message.type === 'getSettings') {
-					return JSON.stringify(builder.settings);
+					// Strip externalSources before sending to webview — it contains secrets (API keys)
+					const { externalSources, ...safeSettings } = builder.settings;
+					return JSON.stringify(safeSettings);
 				}
 				else if (message.type === 'getSummary') {
 					await builder.search_in_all();
@@ -63,6 +75,10 @@ export async function registerEditor(builder: SummaryBuilder) {
 						// Optimistic update: push the updated item to UI immediately
 						editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: true } });
 						const success = await externalManager.markDone(todo);
+						if (!success) {
+							// Roll back the optimistic update so the UI matches reality
+							editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: false } });
+						}
 						return success;
 					}
 

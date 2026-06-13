@@ -29,15 +29,21 @@ export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 	const isExternal = isExternalTodo(todo);
 
 	const markDone = React.useCallback(async (event) => {
-		setChecked(c => !c);
+		const nextChecked = !checked;
+		setChecked(nextChecked);
 
 		if (!checked) {
 			dispatch({ type: 'check', key: todo.key });
 		}
 		// We don't need to "uncheck" because a new summary will be generated, and unchecking will happen then
 
-		await webviewApi.postMessage({ type: 'markDone', value: {...todo, completed: !checked} });
-	}, [checked, todo, dispatch, webviewApi]);
+		const result = await webviewApi.postMessage({ type: 'markDone', value: {...todo, completed: nextChecked} });
+
+		// For external todos the plugin returns a boolean — roll back if the remote update failed
+		if (isExternal && result === false) {
+			setChecked(checked);
+		}
+	}, [checked, todo, dispatch, webviewApi, isExternal]);
 
 	const jumpTo = React.useCallback(async () => {
 		// For external todos with a URL, open it in the browser

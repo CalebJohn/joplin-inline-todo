@@ -15,4 +15,5 @@ export interface ExternalSource {
 	getConfig(): ExternalSourceConfig;
 	updateSettings(settings: Settings): void;
 	clearCache(): void;
+	setRefreshCallback(callback: (result: ExternalFetchResult) => void): void;
 }
