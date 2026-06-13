@@ -10,7 +10,7 @@
     "updatetags": "LOGS=$(git log $(git describe --tags --abbrev=0 HEAD~1)..HEAD~1 --oneline) && git tag -fam \"v$npm_package_version\n\n$LOGS\" v$npm_package_version && git tag -fa v$npm_package_version",
     "test": "jest",
     "postversion": "npm run updatetags && git push origin master --tags",
-    "version": "node -e \"const f='src/manifest.json',fs=require('fs');fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/(\\\"version\\\":\\s*\\\")[^\\\"]*(\\\")/,'$1'+process.env.npm_package_version+'$2'))\" && git add src/manifest.json"
+    "version": "node -e \"const f='src/manifest.json',fs=require('fs');fs.writeFileSync(f,fs.readFileSync(f,'utf8').replace(/(\\\"version\\\":\\s*\\\")[^\\\"]*(\\\")/,'\\$1'+process.env.npm_package_version+'\\$2'))\" && git add src/manifest.json"
   },
   "license": "MIT",
   "homepage": "https://github.com/CalebJohn/joplin-inline-todo#readme",
