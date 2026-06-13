@@ -55,6 +55,7 @@ export function FilterSidebar({ dispatch, filtered, filters, uniqueFields, todos
 							<DateFilterComponent label="Show Upcoming" title="Always show todos that match this filter"field="dateOverride" filter={filters.active.dateOverride} dispatch={dispatch} />
 							<CheckFilterComponent label="Category" field="category" filter={filters.active.category} items={uniqueFields.category} dispatch={dispatch} />
 							<CheckFilterComponent label="Tags" field="tags" filter={filters.active.tags} items={uniqueFields.tags} dispatch={dispatch} />
+							<CheckFilterComponent label="Note Tags" field="note_tags" filter={filters.active.note_tags ?? []} items={uniqueFields.note_tags} dispatch={dispatch} />
 							<NoteFilterComponent label="Note" field="note" filter={filters.active.note} todos={todos} dispatch={dispatch} />
 							<NoteFilterComponent label="Notebook" field="parent_id" filter={filters.active.parent_id} todos={todos} dispatch={dispatch} />
 							<SelectFilterComponent label="Show Completed" field="completed" filter={filters.active.completed} groups={groupsToOptions({"": ["None", "Today", "This Week", "This Month", "This Year", "All Time"]})} defaultClosed={true} dispatch={dispatch} />

@@ -23,6 +23,7 @@ export interface Todo {
 	category: string;
 	date: string;
 	tags: string[];
+	note_tags: string[];
 	completed: boolean;
 	description: string;
 	scrollTo: ScrollToTextValue;
@@ -89,6 +90,7 @@ export interface Filter {
 	date: DateFilter;
 	dateOverride: DateFilter; // Should be replaced by generic overrides eventually
 	tags: string[];
+	note_tags: string[];
 	completed: CompletedFilter;
 }
 
@@ -123,6 +125,7 @@ export interface UniqueFields {
 	parent_id: string[];
 	category: string[];
 	tags: string[];
+	note_tags: string[];
 }
 
 // IPC and webview types copied from 

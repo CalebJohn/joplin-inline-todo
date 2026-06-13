@@ -42,6 +42,7 @@ export const createTodo = (overrides?: Partial<Todo>): Todo => ({
 	category: 'work',
 	date: '',
 	tags: [],
+	note_tags: [],
 	completed: false,
 	description: '',
 	scrollTo: { text: 'test', element: 'ul' },
@@ -61,6 +62,7 @@ export const createFilter = (overrides?: Partial<Filter>): Filter => ({
 	date: 'All',
 	dateOverride: 'None',
 	tags: [],
+	note_tags: [],
 	completed: 'None',
 	...overrides
 });

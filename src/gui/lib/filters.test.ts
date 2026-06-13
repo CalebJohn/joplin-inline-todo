@@ -176,6 +176,101 @@ describe('filters', () => {
 		});
 	});
 
+	describe('note tag filtering', () => {
+		test('filters by single note tag', () => {
+			const todos = [
+				createTodo({ key: 'project-task', note_tags: ['project'] }),
+				createTodo({ key: 'journal-task', note_tags: ['journal'] }),
+				createTodo({ key: 'no-note-tags', note_tags: [] }),
+			];
+			const filters: Filters = {
+				saved: [],
+				active: createFilter({ note_tags: ['project'] }),
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			expect(result.active.todos).toHaveLength(1);
+			expect(result.active.todos[0].key).toBe('project-task');
+		});
+
+		test('filters by multiple note tags (OR logic)', () => {
+			const todos = [
+				createTodo({ key: 'project-task', note_tags: ['project'] }),
+				createTodo({ key: 'journal-task', note_tags: ['journal'] }),
+				createTodo({ key: 'both', note_tags: ['project', 'journal'] }),
+				createTodo({ key: 'no-match', note_tags: ['other'] }),
+			];
+			const filters: Filters = {
+				saved: [],
+				active: createFilter({ note_tags: ['project', 'journal'] }),
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			const keys = result.active.todos.map(t => t.key);
+			expect(keys).toHaveLength(3);
+			expect(keys).not.toContain('no-match');
+		});
+
+		test('note tags and inline tags filter independently', () => {
+			const todos = [
+				createTodo({ key: 'match-both', tags: ['urgent'], note_tags: ['project'] }),
+				createTodo({ key: 'inline-only', tags: ['urgent'], note_tags: [] }),
+				createTodo({ key: 'note-only', tags: [], note_tags: ['project'] }),
+			];
+			const filters: Filters = {
+				saved: [],
+				active: createFilter({ tags: ['urgent'], note_tags: ['project'] }),
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			expect(result.active.todos).toHaveLength(1);
+			expect(result.active.todos[0].key).toBe('match-both');
+		});
+
+		test('filters predating note_tags (undefined) apply no note tag filtering', () => {
+			const todos = [
+				createTodo({ key: 'a', note_tags: ['project'] }),
+				createTodo({ key: 'b', note_tags: [] }),
+			];
+			const oldFilter = createFilter({});
+			delete oldFilter.note_tags;
+			const filters: Filters = {
+				saved: [oldFilter],
+				active: oldFilter,
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			expect(result.active.todos).toHaveLength(2);
+		});
+
+		test('todos without a note_tags field are excluded when filtering by note tag', () => {
+			const oldTodo = createTodo({ key: 'old' });
+			delete oldTodo.note_tags;
+			const todos = [
+				oldTodo,
+				createTodo({ key: 'new', note_tags: ['project'] }),
+			];
+			const filters: Filters = {
+				saved: [],
+				active: createFilter({ note_tags: ['project'] }),
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			expect(result.active.todos).toHaveLength(1);
+			expect(result.active.todos[0].key).toBe('new');
+		});
+	});
+
 	describe('string field filtering', () => {
 		describe('category filtering', () => {
 			test('returns all todos when no category filter', () => {

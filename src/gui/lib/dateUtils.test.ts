@@ -6,7 +6,7 @@ import { Todo } from '../../types';
 function makeTodo(overrides: Partial<Todo> = {}): Todo {
 	return {
 		note: '', note_title: '', parent_id: '', parent_title: '',
-		msg: '', category: '', date: '', tags: [], completed: false,
+		msg: '', category: '', date: '', tags: [], note_tags: [], completed: false,
 		description: '', scrollTo: { text: '', element: 'ul' },
 		...overrides,
 	};

@@ -62,16 +62,17 @@ function matchAny(filter: Set<string>, tags: string[]): boolean {
 	return tags.some(t => filter.has(t));
 }
 
-function filterTags(todos: Todo[], filters: string[]): Todo[] {
-	if (filters.length === 0) { return todos; }
+function filterTags(todos: Todo[], filters: string[], field: 'tags' | 'note_tags' = 'tags'): Todo[] {
+	// Saved filters that predate the note_tags field can have an undefined filter array
+	if (!filters || filters.length === 0) { return todos; }
 	if (filters.length === 1) {
 		const filter = filters[0];
-		return todos.filter(t => t.tags && t.tags.indexOf(filter) >= 0);
+		return todos.filter(t => t[field] && t[field].indexOf(filter) >= 0);
 	}
 
 	const filterSet = new Set(filters);
 
-	return todos.filter(t => t.tags && matchAny(filterSet, t.tags));
+	return todos.filter(t => t[field] && matchAny(filterSet, t[field]));
 }
 
 function filterStrings(todos: Todo[], filterObject: Filter, field: string): Todo[] {
@@ -124,6 +125,7 @@ function calcSingleFilter(summary: Todo[], filter: Filter, checked: Checked): Ac
 
 	todos = filterStrings(todos, filter, "category");
 	todos = filterTags(todos, filter.tags);
+	todos = filterTags(todos, filter.note_tags, 'note_tags');
 	todos = filterStrings(todos, filter, "note");
 	todos = filterStrings(todos, filter, "parent_id");
 	todos = filterDate(todos, filter.date);

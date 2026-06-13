@@ -20,6 +20,7 @@ const emptyFilter = {
 	date: 'All',
 	dateOverride: 'None',
 	tags: [],
+	note_tags: [],
 	completed: 'Today',
 }
 

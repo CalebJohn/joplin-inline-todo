@@ -39,7 +39,9 @@ describe('Integration Tests', () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false)) // search results
 				.mockResolvedValueOnce({ title: 'Work' }) // folder lookup
-				.mockResolvedValueOnce({ title: 'Personal' }); // folder lookup
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note-1 tags
+				.mockResolvedValueOnce({ title: 'Personal' }) // folder lookup
+				.mockResolvedValueOnce({ items: [], has_more: false }); // note-2 tags
 
 			joplinAPI.workspace.selectedNote.mockResolvedValue({ id: 'other-note' });
 			joplinAPI.data.put.mockResolvedValue({});
@@ -162,7 +164,9 @@ describe('Integration Tests', () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false))
 				.mockResolvedValueOnce({ title: 'Work' })
-				.mockResolvedValueOnce({ title: 'Personal' });
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note-1 tags
+				.mockResolvedValueOnce({ title: 'Personal' })
+				.mockResolvedValueOnce({ items: [], has_more: false }); // note-2 tags
 
 			joplinAPI.workspace.selectedNote.mockResolvedValue({ id: 'other-note' });
 			joplinAPI.data.put.mockResolvedValue({});
@@ -194,8 +198,9 @@ describe('Integration Tests', () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false)) // open search
 				.mockResolvedValueOnce({ title: 'Folder' })
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note tags
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false)) // completed search
-				.mockResolvedValue({ title: 'Folder' });
+				.mockResolvedValue({ items: [], has_more: false }); // note tags (folder cached)
 
 			// Test with show_complete_todo = true
 			const settingsWithCompleted = createSettings({ show_complete_todo: true });
@@ -240,8 +245,9 @@ describe('Integration Tests', () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false)) // First scan
 				.mockResolvedValueOnce({ title: 'Folder' }) // Folder lookup
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note tags
 				.mockResolvedValueOnce(createMockSearchResponse(notes, false)) // Second scan
-				.mockResolvedValue({ title: 'Folder' }); // Folder lookup (cached)
+				.mockResolvedValue({ items: [], has_more: false }); // note tags (folder cached)
 
 			const settings = createSettings();
 			const builder = new SummaryBuilder(settings);

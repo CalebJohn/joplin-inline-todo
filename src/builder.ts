@@ -47,6 +47,10 @@ export class SummaryBuilder {
 		}
 
 		if (matches.length > 0) {
+			const note_tags = await this.get_note_tags(note.id);
+			for (const m of matches) {
+				m.note_tags = note_tags;
+			}
 			this._summary[note.id] = matches;
 		}
 	}
@@ -88,6 +92,29 @@ export class SummaryBuilder {
 		}
 		this._initialized = true;
 		this._lastRefresh = new Date();
+	}
+
+	// Fetches the titles of the tags applied to a note
+	async get_note_tags(id: string): Promise<string[]> {
+		const tags: string[] = [];
+		let page = 0;
+		let r;
+		do {
+			page += 1;
+			r = await joplin.data.get(['notes', id, 'tags'], { fields: ['title'], page: page })
+					.catch((error) => {
+						console.error(error);
+						console.warn("Could not find tags for note id: " + id);
+						return { items: [], has_more: false };
+					});
+			if (r.items) {
+				for (const tag of r.items) {
+					tags.push(tag.title);
+				}
+			}
+		} while (r.has_more);
+
+		return tags;
 	}
 
 	// Reads a parent title from cache, or uses the joplin api to get a title based on id

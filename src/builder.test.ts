@@ -157,6 +157,29 @@ describe('SummaryBuilder', () => {
 				parent_title: 'Work Folder',
 			});
 		});
+
+		test('attaches note tags to extracted TODOs', async () => {
+			const note = createNote({
+				id: 'note-1',
+				body: '- [ ] First task @work\n- [ ] Second task @work',
+			});
+
+			joplinAPI.data.get
+				.mockResolvedValueOnce({ title: 'Test Folder' })
+				.mockResolvedValueOnce({ items: [{ title: 'project' }], has_more: true })
+				.mockResolvedValueOnce({ items: [{ title: 'inbox' }], has_more: false });
+
+			await builder.search_in_note(note);
+			const summary = builder.summary;
+
+			expect(summary.map['note-1']).toHaveLength(2);
+			expect(summary.map['note-1'][0].note_tags).toEqual(['project', 'inbox']);
+			expect(summary.map['note-1'][1].note_tags).toEqual(['project', 'inbox']);
+			expect(joplinAPI.data.get).toHaveBeenCalledWith(
+				['notes', 'note-1', 'tags'],
+				{ fields: ['title'], page: 1 }
+			);
+		});
 	});
 
 	describe('get_parent_title', () => {
@@ -170,7 +193,8 @@ describe('SummaryBuilder', () => {
 			await builder.search_in_note(note2);
 
 			// API should only be called once for the same folder
-			expect(joplinAPI.data.get).toHaveBeenCalledTimes(1);
+			const folderCalls = joplinAPI.data.get.mock.calls.filter((c) => c[0][0] === 'folders');
+			expect(folderCalls).toHaveLength(1);
 			expect(joplinAPI.data.get).toHaveBeenCalledWith(
 				['folders', 'folder-1'],
 				{ fields: ['title'] }
@@ -210,7 +234,9 @@ describe('SummaryBuilder', () => {
 		test('retrieves different folder names for different folders', async () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce({ title: 'Work Folder' })
-				.mockResolvedValueOnce({ title: 'Personal Folder' });
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note-1 tags
+				.mockResolvedValueOnce({ title: 'Personal Folder' })
+				.mockResolvedValueOnce({ items: [], has_more: false }); // note-2 tags
 
 			const note1 = createNote({ id: 'note-1', parent_id: 'folder-1', body: '- [ ] Task 1 @work' });
 			const note2 = createNote({ id: 'note-2', parent_id: 'folder-2', body: '- [ ] Task 2 @personal' });
@@ -222,7 +248,8 @@ describe('SummaryBuilder', () => {
 
 			expect(summary.map['note-1'][0].parent_title).toBe('Work Folder');
 			expect(summary.map['note-2'][0].parent_title).toBe('Personal Folder');
-			expect(joplinAPI.data.get).toHaveBeenCalledTimes(2);
+			const folderCalls = joplinAPI.data.get.mock.calls.filter((c) => c[0][0] === 'folders');
+			expect(folderCalls).toHaveLength(2);
 		});
 	});
 
@@ -251,8 +278,9 @@ describe('SummaryBuilder', () => {
 			joplinAPI.data.get
 				.mockResolvedValueOnce(createMockSearchResponse(page1, true))
 				.mockResolvedValueOnce({ title: 'Test Folder' })
+				.mockResolvedValueOnce({ items: [], has_more: false }) // note-1 tags
 				.mockResolvedValueOnce(createMockSearchResponse(page2, false))
-				.mockResolvedValue({ title: 'Test Folder' });
+				.mockResolvedValue({ items: [], has_more: false }); // note-2 tags (folder cached)
 
 			await builder.search_with_query('/"- [ ]"');
 			const summary = builder.summary;
