@@ -130,7 +130,9 @@ export default (props: Props) => {
 				setExternalTodos(allExternal);
 			} else if (message.type === 'updateExternalTodoItem') {
 				const updated = message.value as ExternalTodo;
-				setExternalTodos(prev => prev.map(t => t.externalId === updated.externalId ? updated : t));
+				setExternalTodos(prev => prev.map(t =>
+					t.source === updated.source && t.externalId === updated.externalId ? updated : t
+				));
 			} else {
 				logger.warn('Unknown message:' + JSON.stringify(message));
 			}

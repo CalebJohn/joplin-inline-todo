@@ -2,6 +2,11 @@ import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: LinearClient');
 
+// Linear's StringComparator supports `nin` (not-in) on workflow state type — see
+// https://developers.linear.app/docs/graphql/working-with-the-graphql-api/filtering.
+// Excluding completed/canceled here cuts pagination and rate-limit pressure; the issues
+// we exclude would have been mapped to `completed: true` and mostly hidden anyway.
+// This is a design decision, we don't want to accidentally pull years worth of history
 const ASSIGNED_ISSUES_QUERY = `
 query AssignedIssues($after: String) {
   viewer {
@@ -11,6 +16,7 @@ query AssignedIssues($after: String) {
       first: 100
       after: $after
       orderBy: updatedAt
+      filter: { state: { type: { nin: ["completed", "canceled"] } } }
     ) {
       pageInfo {
         hasNextPage

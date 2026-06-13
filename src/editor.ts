@@ -72,6 +72,11 @@ export async function registerEditor(builder: SummaryBuilder) {
 						if (!externalManager) {
 							return false;
 						}
+						// External sources only support marking done, not un-marking. If the user
+						// unchecks, treat it as a no-op — the next refresh will resync with the source.
+						if (!todo.completed) {
+							return true;
+						}
 						// Optimistic update: push the updated item to UI immediately
 						editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: true } });
 						const success = await externalManager.markDone(todo);

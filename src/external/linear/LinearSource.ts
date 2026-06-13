@@ -41,6 +41,7 @@ export class LinearSource extends BaseExternalSource {
 		if (apiKeyChanged) {
 			this.initClient();
 			this.doneStateCache.clear();
+			this.clearCache();
 		}
 	}
 

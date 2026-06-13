@@ -31,8 +31,9 @@ export abstract class BaseExternalSource implements ExternalSource {
 	abstract getConfig(): ExternalSourceConfig;
 
 	updateSettings(settings: Settings): void {
+		// Subclasses decide whether the change actually invalidates the cache —
+		// joplin.settings.onChange fires for every setting, not just ours.
 		this._settings = settings;
-		this.clearCache();
 	}
 
 	async fetchTodos(): Promise<ExternalFetchResult> {
