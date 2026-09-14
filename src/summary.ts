@@ -19,6 +19,8 @@ export async function update_summary(summary: Summary, settings: Settings, summa
 	await setSummaryBody(summaryBody, summary_id, old_body, settings);
 }
 
+// Joplin throws "Cannot execute a command without a runtime" when a command is registered
+// but the component that provides it isn't currently mounted
 async function setSummaryBody(summaryBody: string, summary_id: string, old_body: string, settings: Settings) {
 	const body = insertNewSummary(old_body, summaryBody);
 
@@ -40,8 +42,18 @@ async function setSummaryBody(summaryBody: string, summary_id: string, old_body:
 		try {
 			await joplin.commands.execute('editor.setText', body);
 		} catch (error) {
-			console.warn("Could not update summary note with editor.setText: " + summary_id);
-			console.error(error);
+			// editor.setText only has a runtime while a note editor is mounted for the note
+			// (on mobile that means the note is open in the editor, the viewer and every other
+			// screen leave the command without a runtime). Joplin throws in that case, it's an
+			// expected condition and the api call below is what updates the note.
+			// https://github.com/CalebJohn/joplin-inline-todo/issues/61
+			// Notably, this must not be logged with console.error: Joplin marks a plugin as
+			// having errors (and shows an error indicator on the plugin's settings page) when
+			// it logs anything at error level.
+			if (!String(error).includes('Cannot execute a command without a runtime')) {
+				console.error(error);
+				console.warn("Could not update summary note with editor.setText: " + summary_id);
+			}
 		}
 	}
 

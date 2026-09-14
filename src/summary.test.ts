@@ -83,6 +83,31 @@ describe('summary', () => {
 
 				// Should still call the API even if editor.setText fails
 				expect(joplinAPI.data.put).toHaveBeenCalled();
+
+				// Unexpected failures are still surfaced in the plugin log
+				expect(consoleErrorSpy).toHaveBeenCalled();
+			});
+
+			test('updates the note without logging an error when no editor runtime is available', async () => {
+				const todos = [createTodo({ msg: 'Task' })];
+				const summaryMap = createSummaryMap(todos);
+				const summary = createSummary({ map: summaryMap });
+				const settings = createSettings({ force_sync: false });
+
+				joplinAPI.workspace.selectedNote.mockResolvedValue({ id: 'summary-id' });
+				// Thrown by Joplin when the note is displayed without a mounted editor,
+				// which is the default on mobile (viewer mode)
+				joplinAPI.commands.execute.mockRejectedValue(new Error(
+					'Cannot execute a command without a runtime: editor.setText (Calling api.joplin.commands.execute)'
+				));
+				joplinAPI.data.put.mockResolvedValue({});
+
+				await update_summary(summary, settings, 'summary-id', '<!-- inline-todo-plugin -->');
+
+				expect(joplinAPI.data.put).toHaveBeenCalled();
+				// Joplin flags a plugin as having errors when it logs at error level,
+				// which shows up as an error indicator on the plugin's settings page
+				expect(consoleErrorSpy).not.toHaveBeenCalled();
 			});
 
 			test('handles API errors gracefully', async () => {
