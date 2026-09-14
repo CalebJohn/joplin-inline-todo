@@ -34,7 +34,7 @@ interface Props {
 
 
 export function SavedFiltersComponent({ dispatch, filtered, filters }: Props) {
-	const [showSaveDialog, setShowSaveDialog] = useState(false);
+	const [renaming, setRenaming] = useState<string | null>(null);
 
 	const switchToFilter = (item) => {
 		const savedFilter = filters.saved.find(sf => sf.filterName === item.filterName);
@@ -52,7 +52,7 @@ export function SavedFiltersComponent({ dispatch, filtered, filters }: Props) {
 			oldName: item.filterName,
 			newName: newName,
 		});
-		setShowSaveDialog(false);
+		setRenaming(null);
 	}
 
 	const deleteFilter = (e, item) => {
@@ -84,7 +84,7 @@ export function SavedFiltersComponent({ dispatch, filtered, filters }: Props) {
 							</SidebarMenuAction>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent side="right" align="start">
-							<DropdownMenuItem onSelect={() => setShowSaveDialog(true)}>
+							<DropdownMenuItem onSelect={() => setRenaming(sf.filterName)}>
 								<span>Rename Filter</span>
 							</DropdownMenuItem>
 							<DropdownMenuItem variant="destructive" onSelect={(e) => deleteFilter(e, sf)}>
@@ -92,7 +92,7 @@ export function SavedFiltersComponent({ dispatch, filtered, filters }: Props) {
 							</DropdownMenuItem>
 						</DropdownMenuContent>
 					</DropdownMenu>
-					<Dialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
+					<Dialog open={renaming === sf.filterName} onOpenChange={(open) => setRenaming(open ? sf.filterName : null)}>
 						<DialogContent className="sm:max-w-[425px]">
 							<DialogHeader>
 								<DialogTitle>Rename Filter</DialogTitle>

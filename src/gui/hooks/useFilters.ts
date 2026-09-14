@@ -76,7 +76,10 @@ function filterReducer(filters, action): Filters {
 
 				return f;
 			});
-			return { ...filters, saved: newSaved };
+			const newActive = filters.active.filterName === action.oldName
+				? { ...filters.active, filterName: action.newName }
+				: filters.active;
+			return { ...filters, active: newActive, saved: newSaved };
 		}
 		case 'deleteSaved': {
 			const newSaved = filters.saved.filter((f) => f.filterName !== action.name);
