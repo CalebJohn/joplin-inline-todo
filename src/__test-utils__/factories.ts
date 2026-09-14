@@ -1,4 +1,4 @@
-import { Note, Settings, Todo, Filter, Summary, SummaryMap } from '../types';
+import { Note, Settings, Todo, ExternalTodo, Filter, Summary, SummaryMap } from '../types';
 import { regexes } from '../settings_tables';
 
 /**
@@ -51,6 +51,26 @@ export const createTodo = (overrides?: Partial<Todo>): Todo => ({
 });
 
 /**
+ * Factory function to create a mock ExternalTodo object
+ */
+export const createExternalTodo = (overrides?: Partial<ExternalTodo>): ExternalTodo => ({
+	...createTodo({
+		note: 'linear:ENG-1',
+		note_title: 'ENG-1',
+		parent_id: 'linear:team-1',
+		parent_title: 'Engineering',
+		msg: 'External task',
+		category: 'Todo',
+		scrollTo: { text: '', element: 'ul' },
+		key: 'linear:issue-1',
+	}),
+	source: 'linear',
+	externalId: 'issue-1',
+	externalUrl: 'https://linear.app/team/issue/ENG-1',
+	...overrides
+});
+
+/**
  * Factory function to create a mock Filter object
  */
 export const createFilter = (overrides?: Partial<Filter>): Filter => ({
@@ -63,6 +83,7 @@ export const createFilter = (overrides?: Partial<Filter>): Filter => ({
 	dateOverride: 'None',
 	tags: [],
 	note_tags: [],
+	source: [],
 	completed: 'None',
 	...overrides
 });

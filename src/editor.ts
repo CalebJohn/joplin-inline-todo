@@ -20,15 +20,20 @@ export async function registerEditor(builder: SummaryBuilder) {
 	const versionInfo = await joplin.versionInfo();
 	const editors = joplin.views.editors;
 
-	// Initialize external source manager
+	// External sources are intentionally available only in the custom editor.
+	// They are never written into the summary note.
 	externalManager = createExternalManager(builder.settings);
 
 	// Track the active editor view so background refreshes can push fresh data to the UI.
 	// Joplin typically has one active summary editor at a time; the latest onSetup wins.
 	let activeView: any = null;
 	externalManager.setRefreshCallback((state) => {
-		if (activeView) {
+		if (!activeView) return;
+		// The view may have been closed since it was recorded.
+		try {
 			editors.postMessage(activeView, { type: 'updateExternalTodos', value: state });
+		} catch (error) {
+			logger.warn('Could not push external todos to the editor view:', error);
 		}
 	});
 
@@ -68,24 +73,16 @@ export async function registerEditor(builder: SummaryBuilder) {
 				else if (message.type === 'markDone') {
 					const todo = message.value as Todo | ExternalTodo;
 
-					// Handle external todos differently
+					// External todos return a boolean so the card can roll back on failure
 					if (isExternalTodo(todo)) {
 						if (!externalManager) {
 							return false;
 						}
-						// External sources only support marking done, not un-marking. If the user
-						// unchecks, treat it as a no-op — the next refresh will resync with the source.
+						// External sources only support marking done, not un-marking
 						if (!todo.completed) {
-							return true;
+							return false;
 						}
-						// Optimistic update: push the updated item to UI immediately
-						editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: true } });
-						const success = await externalManager.markDone(todo);
-						if (!success) {
-							// Roll back the optimistic update so the UI matches reality
-							editors.postMessage(view, { type: 'updateExternalTodoItem', value: { ...todo, completed: false } });
-						}
-						return success;
+						return await externalManager.markDone(todo);
 					}
 
 					// Handle local todos as before
@@ -103,6 +100,15 @@ export async function registerEditor(builder: SummaryBuilder) {
 					await joplin.commands.execute('openNote', todo.note);
 					await new Promise(resolve => setTimeout(resolve, 500));
 					await joplin.commands.execute('editor.scrollToText', todo.scrollTo);
+					return;
+				}
+				else if (message.type === 'openUrl') {
+					const url = message.value;
+					if (typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
+						logger.warn('Refusing to open non-http(s) URL: ' + JSON.stringify(url));
+						return;
+					}
+					await joplin.commands.execute('openItem', url);
 					return;
 				}
 				else if (message.type === 'setFilters') {

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Todo } from "../types";
+import { AnyTodo, isExternalTodo } from "../types";
 import { CheckFilterComponent } from "./CheckFilter";
 import Logger from "@joplin/utils/Logger";
 
@@ -9,7 +9,7 @@ interface Props {
 	label: string;
 	field: 'note' | 'parent_id';
 	filter: string[];
-	todos: Todo[];
+	todos: AnyTodo[];
 	defaultClosed?: boolean;
 	dispatch: (o) => void;
 }
@@ -19,7 +19,9 @@ export function NoteFilterComponent({ label, field, filter, todos, defaultClosed
 		const map = new Map<string, string>();
 
 		if (field === 'note') {
+			// External todos have no note. Their team maps to parent_id and stays in the Notebook list.
 			todos.forEach(todo => {
+				if (isExternalTodo(todo)) return;
 				if (!map.has(todo.note)) {
 					map.set(todo.note, todo.note_title);
 				}

@@ -34,8 +34,6 @@ export interface ExternalTodo extends Todo {
 	source: string;
 	externalId: string;
 	externalUrl?: string;
-	externalState?: string;
-	icon?: string;
 }
 
 export type AnyTodo = Todo | ExternalTodo;
@@ -48,7 +46,8 @@ export interface ExternalFetchResult {
 	source: string;
 	todos: ExternalTodo[];
 	error?: string;
-	timestamp: Date;
+	// Epoch milliseconds. This crosses the webview IPC boundary as JSON.
+	timestamp: number;
 }
 
 export type ExternalSourcesState = Record<string, ExternalFetchResult>;
@@ -121,6 +120,8 @@ export interface Filter {
 	dateOverride: DateFilter; // Should be replaced by generic overrides eventually
 	tags: string[];
 	note_tags: string[];
+	// 'local' for todos from notes, otherwise the external source id. Empty means all.
+	source: string[];
 	completed: CompletedFilter;
 }
 
@@ -156,6 +157,7 @@ export interface UniqueFields {
 	category: string[];
 	tags: string[];
 	note_tags: string[];
+	source: string[];
 }
 
 // IPC and webview types copied from 
@@ -171,7 +173,7 @@ export type IpcMessageType =
 	'shouldUseDarkColors' |
 	'getExternalTodos' |
 	'updateExternalTodos' |
-	'updateExternalTodoItem';
+	'openUrl';
 
 export interface IpcMessage {
 	type: IpcMessageType;

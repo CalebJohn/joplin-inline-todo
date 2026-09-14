@@ -21,6 +21,7 @@ const emptyFilter = {
 	dateOverride: 'None',
 	tags: [],
 	note_tags: [],
+	source: [],
 	completed: 'Today',
 }
 
@@ -57,6 +58,10 @@ function filterReducer(filters, action): Filters {
 		}
 		case 'check': {
 			const newChecked = { ...filters.checked, [action.key]: DateTime.now().toISODate() };
+			return { ...filters, checked: newChecked };
+		}
+		case 'uncheck': {
+			const { [action.key]: _removed, ...newChecked } = filters.checked;
 			return { ...filters, checked: newChecked };
 		}
 		case 'updateActiveField': {

@@ -1,19 +1,21 @@
 import { ExternalTodo, ExternalFetchResult, Settings } from '../types';
 
-export interface ExternalSourceConfig {
-	enabled: boolean;
-	error?: string;
+export type ExternalErrorKind = 'auth' | 'rate_limit' | 'network' | 'other';
+
+// Thrown by source clients so BaseExternalSource can decide how long to back off.
+export class ExternalSourceError extends Error {
+	constructor(message: string, readonly kind: ExternalErrorKind, readonly retryAfterMs?: number) {
+		super(message);
+		this.name = 'ExternalSourceError';
+	}
 }
 
 export interface ExternalSource {
 	readonly sourceId: string;
-	readonly displayName: string;
 
 	isEnabled(): boolean;
 	fetchTodos(forceFresh?: boolean): Promise<ExternalFetchResult>;
 	markDone(todo: ExternalTodo): Promise<boolean>;
-	getConfig(): ExternalSourceConfig;
 	updateSettings(settings: Settings): void;
-	clearCache(): void;
 	setRefreshCallback(callback: (result: ExternalFetchResult) => void): void;
 }

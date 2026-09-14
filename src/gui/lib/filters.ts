@@ -1,4 +1,4 @@
-import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo, AnyTodo } from "../../types";
+import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo, AnyTodo, isExternalTodo } from "../../types";
 import { localDateTime } from "./dateUtils";
 import { DateTime, Duration } from "luxon";
 import Logger from "@joplin/utils/Logger";
@@ -75,6 +75,18 @@ function filterTags(todos: Todo[], filters: string[], field: 'tags' | 'note_tags
 	return todos.filter(t => t[field] && matchAny(filterSet, t[field]));
 }
 
+// 'local' for todos that come from notes, otherwise the external source id
+export function todoSourceKey(todo: Todo): string {
+	return isExternalTodo(todo) ? todo.source : 'local';
+}
+
+function filterSource(todos: Todo[], filters: string[]): Todo[] {
+	// Saved filters that predate the source field can have an undefined filter array
+	if (!filters || filters.length === 0) { return todos; }
+	const filterSet = new Set(filters);
+	return todos.filter(t => filterSet.has(todoSourceKey(t)));
+}
+
 function filterStrings(todos: Todo[], filterObject: Filter, field: string): Todo[] {
 	const filters: string[] = filterObject[field]
 
@@ -128,6 +140,7 @@ function calcSingleFilter(summary: Todo[], filter: Filter, checked: Checked): Ac
 	todos = filterTags(todos, filter.note_tags, 'note_tags');
 	todos = filterStrings(todos, filter, "note");
 	todos = filterStrings(todos, filter, "parent_id");
+	todos = filterSource(todos, filter.source);
 	todos = filterDate(todos, filter.date);
 
 

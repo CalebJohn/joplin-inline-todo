@@ -1,4 +1,5 @@
 import Logger from "@joplin/utils/Logger";
+import { ExternalSourceError } from '../types';
 
 const logger = Logger.create('inline-todo: LinearClient');
 
@@ -54,7 +55,7 @@ query AssignedIssues($after: String) {
 `;
 
 const GET_DONE_STATE_QUERY = `
-query GetDoneState($teamId: String!) {
+query GetDoneState($teamId: ID!) {
   workflowStates(filter: { team: { id: { eq: $teamId } }, type: { eq: "completed" } }) {
     nodes {
       id
@@ -105,6 +106,13 @@ export interface LinearIssue {
 	updatedAt: string;
 }
 
+// Retry-After is in seconds. An absent or non-numeric value (an HTTP date) yields undefined.
+function parseRetryAfter(header: string | null): number | undefined {
+	if (!header) return undefined;
+	const seconds = Number(header);
+	return Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : undefined;
+}
+
 export class LinearClient {
 	private apiKey: string;
 	private baseUrl = 'https://api.linear.app/graphql';
@@ -114,30 +122,40 @@ export class LinearClient {
 	}
 
 	private async query<T>(query: string, variables?: Record<string, any>): Promise<T> {
-		const response = await fetch(this.baseUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': this.apiKey,
-			},
-			body: JSON.stringify({ query, variables }),
-		});
+		let response: Response;
+		try {
+			response = await fetch(this.baseUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': this.apiKey,
+				},
+				body: JSON.stringify({ query, variables }),
+			});
+		} catch (error) {
+			const detail = error instanceof Error ? error.message : String(error);
+			throw new ExternalSourceError(`Could not reach the Linear API: ${detail}`, 'network');
+		}
 
 		if (!response.ok) {
 			if (response.status === 401) {
-				throw new Error('Invalid Linear API key. Please check your settings.');
+				throw new ExternalSourceError('Invalid Linear API key. Please check your settings.', 'auth');
 			}
 			if (response.status === 429) {
-				throw new Error('Rate limited by Linear API. Please wait a moment.');
+				throw new ExternalSourceError(
+					'Rate limited by Linear API. Please wait a moment.',
+					'rate_limit',
+					parseRetryAfter(response.headers.get('Retry-After')),
+				);
 			}
 			const text = await response.text();
-			throw new Error(`Linear API error: ${response.status} ${text}`);
+			throw new ExternalSourceError(`Linear API error: ${response.status} ${text}`, 'other');
 		}
 
 		const json = await response.json();
 
 		if (json.errors?.length > 0) {
-			throw new Error(`Linear GraphQL error: ${json.errors[0].message}`);
+			throw new ExternalSourceError(`Linear GraphQL error: ${json.errors[0].message}`, 'other');
 		}
 
 		return json.data;

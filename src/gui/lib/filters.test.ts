@@ -1,7 +1,7 @@
 import calcFiltered from './filters';
 import { Todo, Filter, Filters, Checked, ActiveFiltered } from '../../types';
 import { DateTime } from 'luxon';
-import { createTodo, createFilter } from '../../__test-utils__/factories';
+import { createTodo, createExternalTodo, createFilter } from '../../__test-utils__/factories';
 import { mockNow, dateFixtures, getFilteredKeys } from '../../__test-utils__/helpers';
 
 describe('filters', () => {
@@ -268,6 +268,51 @@ describe('filters', () => {
 			const result = calcFiltered(todos, filters);
 			expect(result.active.todos).toHaveLength(1);
 			expect(result.active.todos[0].key).toBe('new');
+		});
+	});
+
+	describe('source filtering', () => {
+		const todos = [
+			createTodo({ key: 'local-a' }),
+			createTodo({ key: 'local-b' }),
+			createExternalTodo({ key: 'linear-a' }),
+		];
+
+		test('filters predating source (undefined) keep every todo', () => {
+			const oldFilter = createFilter({});
+			delete oldFilter.source;
+			const filters: Filters = {
+				saved: [oldFilter],
+				active: oldFilter,
+				activeHistory: [],
+				checked: {},
+			};
+
+			const result = calcFiltered(todos, filters);
+			expect(result.active.todos).toHaveLength(3);
+			expect(result.saved[0].openCount).toBe(3);
+		});
+
+		test('empty source filter keeps every todo', () => {
+			const keys = getFilteredKeys(todos, { source: [] });
+			expect(keys).toHaveLength(3);
+		});
+
+		test('"local" drops external todos', () => {
+			const keys = getFilteredKeys(todos, { source: ['local'] });
+			expect(keys).toEqual(expect.arrayContaining(['local-a', 'local-b']));
+			expect(keys).toHaveLength(2);
+			expect(keys).not.toContain('linear-a');
+		});
+
+		test('"linear" keeps only Linear todos', () => {
+			const keys = getFilteredKeys(todos, { source: ['linear'] });
+			expect(keys).toEqual(['linear-a']);
+		});
+
+		test('"local" and "linear" keep both', () => {
+			const keys = getFilteredKeys(todos, { source: ['local', 'linear'] });
+			expect(keys).toHaveLength(3);
 		});
 	});
 

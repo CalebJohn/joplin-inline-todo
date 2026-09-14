@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useEffect, useState, useMemo } from "react";
 import { Settings, Summary, Todo, WebviewApi, ExternalTodo, ExternalSourcesState, AnyTodo } from "../../types";
+import { sourceDisplayName } from "../lib/sourceIcons";
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: usePluginData');
@@ -19,12 +20,26 @@ function addStableKey(todo: Todo): Todo {
 // point of view (contrast to the useFilters hook)
 export default (props: Props) => {
 	const [summary, setSummary] = useState<Todo[]>([]);
-	const [externalTodos, setExternalTodos] = useState<ExternalTodo[]>([]);
+	// Latest result per external source. A result can carry both todos (the last good
+	// ones) and an error, so both are derived from it.
+	const [externalState, setExternalState] = useState<ExternalSourcesState>({});
 	const [externalLoading, setExternalLoading] = useState(false);
-	const [externalError, setExternalError] = useState<string | null>(null);
+	const [externalIpcError, setExternalIpcError] = useState<string | null>(null);
 	const [summaryLoading, setSummaryLoading] = useState(false);
 	const [summaryError, setSummaryError] = useState<string | null>(null);
 	const [settings, setSettings] = useState<Settings>(null);
+
+	const externalTodos: ExternalTodo[] = useMemo(() => {
+		return Object.values(externalState).flatMap(result => result.todos);
+	}, [externalState]);
+
+	const externalError: string | null = useMemo(() => {
+		if (externalIpcError) return externalIpcError;
+		const messages = Object.values(externalState)
+			.filter(result => result.error)
+			.map(result => `${sourceDisplayName(result.source)}: ${result.error}`);
+		return messages.length > 0 ? messages.join('; ') : null;
+	}, [externalState, externalIpcError]);
 
 	// Combine local and external todos
 	const allTodos: AnyTodo[] = useMemo(() => {
@@ -53,34 +68,24 @@ export default (props: Props) => {
 	const refreshExternalTodos = (forceFresh: boolean = false) => {
 		const fn = async () => {
 			setExternalLoading(true);
-			setExternalError(null);
+			setExternalIpcError(null);
 
 			try {
-				const externalState: ExternalSourcesState = await props.webviewApi.postMessage({
+				const newState: ExternalSourcesState = await props.webviewApi.postMessage({
 					type: 'getExternalTodos',
 					value: { forceFresh }
 				});
 
-				// Flatten all external todos from all sources
-				const allExternal: ExternalTodo[] = [];
-				let hasErrors = false;
-
-				for (const [sourceId, result] of Object.entries(externalState)) {
+				for (const [sourceId, result] of Object.entries(newState)) {
 					if (result.error) {
-						hasErrors = true;
 						logger.error(`Error from ${sourceId}: ${result.error}`);
 					}
-					allExternal.push(...result.todos);
 				}
 
-				setExternalTodos(allExternal);
-
-				if (hasErrors) {
-					setExternalError('Some external sources had errors. Check logs for details.');
-				}
+				setExternalState(newState);
 			} catch (error) {
 				logger.error('Failed to fetch external todos:', error);
-				setExternalError('Failed to fetch external todos');
+				setExternalIpcError('Failed to fetch external todos');
 			} finally {
 				setExternalLoading(false);
 			}
@@ -123,17 +128,9 @@ export default (props: Props) => {
 				const flatSummary = Object.values(newSummary.map).flat();
 				setSummary(flatSummary.map(addStableKey));
 			} else if (message.type === 'updateExternalTodos') {
-				const externalState = message.value as ExternalSourcesState;
-				const allExternal: ExternalTodo[] = [];
-				for (const result of Object.values(externalState)) {
-					allExternal.push(...result.todos);
-				}
-				setExternalTodos(allExternal);
-			} else if (message.type === 'updateExternalTodoItem') {
-				const updated = message.value as ExternalTodo;
-				setExternalTodos(prev => prev.map(t =>
-					t.source === updated.source && t.externalId === updated.externalId ? updated : t
-				));
+				// A background refresh reports only the sources that refreshed
+				const updated = message.value as ExternalSourcesState;
+				setExternalState(prev => ({ ...prev, ...updated }));
 			} else {
 				logger.warn('Unknown message:' + JSON.stringify(message));
 			}

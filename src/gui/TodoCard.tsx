@@ -14,8 +14,9 @@ import { useState } from 'react';
 // 	DropdownMenuTrigger,
 // } from "@/src/gui/components/ui/dropdown-menu";
 import { Filters, Todo, WebviewApi, AnyTodo, ExternalTodo, isExternalTodo } from "../types";
-import { Notebook, Globe } from "lucide-react";
+import { Notebook } from "lucide-react";
 import { formatDate, dateColor } from "./lib/dateUtils";
+import { SourceIcon, sourceDisplayName } from "./lib/sourceIcons";
 
 interface Props {
 	todo: AnyTodo;
@@ -39,16 +40,20 @@ export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 
 		const result = await webviewApi.postMessage({ type: 'markDone', value: {...todo, completed: nextChecked} });
 
-		// For external todos the plugin returns a boolean — roll back if the remote update failed
+		// For external todos the plugin returns a boolean. Roll back if the remote update failed.
 		if (isExternal && result === false) {
 			setChecked(checked);
+			if (nextChecked) {
+				dispatch({ type: 'uncheck', key: todo.key });
+			}
 		}
 	}, [checked, todo, dispatch, webviewApi, isExternal]);
 
 	const jumpTo = React.useCallback(async () => {
-		// For external todos with a URL, open it in the browser
+		// For external todos with a URL, ask the plugin to open it in the browser.
+		// window.open does not work reliably from the editor webview on mobile.
 		if (isExternal && (todo as ExternalTodo).externalUrl) {
-			window.open((todo as ExternalTodo).externalUrl, '_blank');
+			await webviewApi.postMessage({ type: 'openUrl', value: (todo as ExternalTodo).externalUrl });
 			return;
 		}
 		// For local todos, navigate to the note
@@ -161,12 +166,8 @@ export function TodoCard({ todo, filters, dispatch, webviewApi }: Props) {
 				)}
 				{isExternal && (
 					<span className="flex items-center gap-1 text-xs">
-						{(todo as ExternalTodo).icon ? (
-							<span className="size-3 flex items-center" dangerouslySetInnerHTML={{ __html: (todo as ExternalTodo).icon }} />
-						) : (
-							<Globe className="size-3" />
-						)}
-						{(todo as ExternalTodo).source}
+						<SourceIcon source={(todo as ExternalTodo).source} className="size-3" />
+						{sourceDisplayName((todo as ExternalTodo).source)}
 					</span>
 				)}
 			</div>

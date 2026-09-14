@@ -7,6 +7,7 @@ import { SaveFilterComponent } from "./SaveFilter"
 import { SavedFiltersComponent } from "./SavedFilters"
 import { SelectFilterComponent } from "./SelectFilter";
 import { groupsToOptions } from "./lib/selectUtils";
+import { sourceDisplayName } from "./lib/sourceIcons";
 import { Button } from "@/src/gui/components/ui/button";
 import {
 	Sidebar,
@@ -18,7 +19,7 @@ import {
 	SidebarMenu,
 	SidebarMenuItem,
 } from "@/src/gui/components/ui/sidebar";
-import { Filtered, Filters, Todo, UniqueFields } from "../types";
+import { Filtered, Filters, AnyTodo, UniqueFields } from "../types";
 import Logger from "@joplin/utils/Logger";
 
 const logger = Logger.create('inline-todo: Sidebar.tsx');
@@ -28,7 +29,7 @@ interface Props {
 	filtered: Filtered;
 	filters: Filters;
 	uniqueFields: UniqueFields;
-	todos: Todo[];
+	todos: AnyTodo[];
 }
 
 export function FilterSidebar({ dispatch, filtered, filters, uniqueFields, todos }: Props) {
@@ -58,6 +59,10 @@ export function FilterSidebar({ dispatch, filtered, filters, uniqueFields, todos
 							<CheckFilterComponent label="Note Tags" field="note_tags" filter={filters.active.note_tags ?? []} items={uniqueFields.note_tags} dispatch={dispatch} />
 							<NoteFilterComponent label="Note" field="note" filter={filters.active.note} todos={todos} dispatch={dispatch} />
 							<NoteFilterComponent label="Notebook" field="parent_id" filter={filters.active.parent_id} todos={todos} dispatch={dispatch} />
+							{/* With only local todos there is nothing to choose between */}
+							{uniqueFields.source.length > 1 && (
+								<CheckFilterComponent label="Source" field="source" filter={filters.active.source ?? []} items={uniqueFields.source} getLabel={sourceDisplayName} dispatch={dispatch} />
+							)}
 							<SelectFilterComponent label="Show Completed" field="completed" filter={filters.active.completed} groups={groupsToOptions({"": ["None", "Today", "This Week", "This Month", "This Year", "All Time"]})} defaultClosed={true} dispatch={dispatch} />
 						</SidebarMenu>
 					</SidebarGroupContent>
