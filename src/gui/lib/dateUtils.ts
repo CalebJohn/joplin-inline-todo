@@ -3,14 +3,11 @@ import { Todo } from "../../types"
 
 // without a timezone, dates will be interpreted as UTC.
 // We do the below trickery so that the local date is handled as local
+
 export function localDate(todo_date: string): Date {
-	const date = new Date(todo_date);
-	// Convert date into local time, this works because... javascript
-	return new Date(
-		date.getUTCFullYear(),
-		date.getUTCMonth(),
-		date.getUTCDate()
-	);
+    const m = todo_date.match(/(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (!m) return new Date(NaN);
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
 }
 
 // Return a luxon DateTime from the todo.date
