@@ -1,5 +1,5 @@
 import { ActiveFiltered, Checked, CompletedFilter, DateFilter, Filter, Filtered, Filters, Todo, AnyTodo, isExternalTodo } from "../../types";
-import { localDateTime } from "./dateUtils";
+import { localDate, localDateTime } from "./dateUtils";
 import { DateTime, Duration } from "luxon";
 import Logger from "@joplin/utils/Logger";
 
@@ -161,7 +161,8 @@ function sortTodos(active: ActiveFiltered): ActiveFiltered {
 			return 1;
 		}
 		if (!!a.date && !!b.date && (a.date !== b.date)) {
-			return Date.parse(a.date) - Date.parse(b.date);
+			// Use localDate so slash-format dates sort consistently with ISO ones
+			return localDate(a.date).valueOf() - localDate(b.date).valueOf();
 		}
 
 		if (a.category !== b.category) {

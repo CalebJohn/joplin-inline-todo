@@ -68,6 +68,47 @@ describe('localDate', () => {
 		expect(d.getMonth()).toBe(11);
 		expect(d.getDate()).toBe(31);
 	});
+
+	it('parses 10-14-2026 (month-first with dashes)', () => {
+		const d = localDate('10-14-2026');
+		expect(d.getFullYear()).toBe(2026);
+		expect(d.getMonth()).toBe(9);
+		expect(d.getDate()).toBe(14);
+	});
+
+	it('handles the same day written with slashes and as ISO identically', () => {
+		// The original bug: slash dates were read in the wrong zone
+		expect(localDate('2026/10/14').valueOf()).toBe(localDate('2026-10-14').valueOf());
+	});
+
+	it('parses partial ISO dates as the start of the period', () => {
+		const month = localDate('2024-01');
+		expect(month.getFullYear()).toBe(2024);
+		expect(month.getMonth()).toBe(0);
+		expect(month.getDate()).toBe(1);
+
+		const year = localDate('2024');
+		expect(year.getFullYear()).toBe(2024);
+		expect(year.getMonth()).toBe(0);
+		expect(year.getDate()).toBe(1);
+	});
+
+	it('trims surrounding whitespace', () => {
+		const d = localDate('  2024-01-15  ');
+		expect(d.getFullYear()).toBe(2024);
+		expect(d.getDate()).toBe(15);
+	});
+
+	it('returns an invalid Date for out-of-range dates', () => {
+		expect(isNaN(localDate('2024-13-01').valueOf())).toBe(true); // invalid month
+		expect(isNaN(localDate('2024-01-32').valueOf())).toBe(true); // invalid day
+	});
+
+	it('returns an invalid Date for malformed input', () => {
+		for (const input of ['not-a-date', 'null', 'undefined', '', ' ', '2024-01-15'.repeat(100)]) {
+			expect(isNaN(localDate(input).valueOf())).toBe(true);
+		}
+	});
 });
 
 describe('localDateTime', () => {
@@ -88,6 +129,12 @@ describe('formatDate', () => {
 			if (args.length === 0) return fixed;
 			// @ts-ignore
 			return new realDate(...args);
+		});
+		// Keep the static Date helpers; luxon calls Date.now()/Date.UTC() internally
+		Object.defineProperties(global.Date, {
+			now: { value: realDate.now },
+			UTC: { value: realDate.UTC },
+			parse: { value: realDate.parse },
 		});
 	}
 
@@ -144,6 +191,12 @@ describe('dateColor', () => {
 			if (args.length === 0) return fixed;
 			// @ts-ignore
 			return new realDate(...args);
+		});
+		// Keep the static Date helpers; luxon calls Date.now()/Date.UTC() internally
+		Object.defineProperties(global.Date, {
+			now: { value: realDate.now },
+			UTC: { value: realDate.UTC },
+			parse: { value: realDate.parse },
 		});
 	}
 
