@@ -4,9 +4,13 @@ import { createFilter } from './factories';
 import calcFiltered from '../gui/lib/filters';
 
 /**
- * Mock "now" time for date-based tests
+ * Mock "now" time for date-based tests.
+ *
+ * This is a *local* wall-clock time (noon, so +/- a day of arithmetic stays on
+ * the same calendar day). Todo dates are parsed to local midnight, so a UTC
+ * mock would drift against them in timezones ahead of UTC.
  */
-export const mockNow = DateTime.fromISO('2024-06-15T12:00:00Z', { zone: 'utc' });
+export const mockNow = DateTime.fromObject({ year: 2024, month: 6, day: 15, hour: 12 });
 
 /**
  * Date fixtures for testing various date filtering scenarios
